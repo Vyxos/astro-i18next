@@ -36,9 +36,10 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsup",
+    "clean": "rm -rf ./dist",
+    "build": "npm run clean && tsup",
     "dev": "tsup --watch",
-    "lint": "eslint src --ext .ts",
+    "lint": "eslint src",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
