@@ -1,0 +1,65 @@
+{
+  "name": "@vyxos/astro-i18next",
+  "version": "0.1.0",
+  "description": "i18n integration for Astro",
+  "author": "Marek Fodor",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "astro": "^5.11.0"
+  },
+  "keywords": [
+    "astro",
+    "i18n",
+    "internationalization",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vyxos/astro-i18next.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vyxos/astro-i18next/issues"
+  },
+  "homepage": "https://github.com/vyxos/astro-i18next#readme",
+  "dependencies": {
+    "i18next": "^25.3.2",
+    "i18next-browser-languagedetector": "^8.2.0",
+    "i18next-fs-backend": "^2.6.0",
+    "i18next-http-backend": "^3.0.2",
+    "pathe": "^2.0.3"
+  }
+}
