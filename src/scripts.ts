@@ -21,30 +21,46 @@ export function generateServerScript(
 }
 
 /**
- * Generates the client-side initialization script
+ * Generates the client-side initialization script with on-demand loading
  */
 export function generateClientScript(baseConfig: I18nBaseConfig): string {
   return `
     import i18next from "i18next";
     import LanguageDetector from "i18next-browser-languagedetector";
-    import { loadTranslation } from "virtual:i18n-loader";
     
-    const customBackend = {
+    const dynamicBackend = {
       type: 'backend',
       init: function() {},
-      read: function(language, namespace, callback) {
+      read: async function(language, namespace, callback) {
         try {
-          const data = loadTranslation(language, namespace);
+          const { loadTranslation } = await import('virtual:i18n-loader');
+          const data = await loadTranslation(language, namespace);
           callback(null, data);
         } catch (err) {
-          callback(err, null);
+          console.warn(\`[i18next] Failed to load \${language}/\${namespace}:\`, err);
+          callback(null, {});
         }
       }
     };
     
+    // Global namespace loader for route-based loading
+    window.__i18nLoadNamespaces = async function(namespaces) {
+      const currentLang = i18next.language || '${baseConfig.lng}';
+      const promises = namespaces.map(ns => 
+        new Promise((resolve) => {
+          if (i18next.hasResourceBundle(currentLang, ns)) {
+            resolve(null);
+          } else {
+            i18next.loadNamespaces(ns, resolve);
+          }
+        })
+      );
+      await Promise.all(promises);
+    };
+    
     i18next
       .use(LanguageDetector)
-      .use(customBackend)
+      .use(dynamicBackend)
       .init({
         ...${JSON.stringify(baseConfig)},
         initImmediate: false,
@@ -54,7 +70,9 @@ export function generateClientScript(baseConfig: I18nBaseConfig): string {
           caches: []
         },
         load: 'currentOnly',
-        partialBundledLanguages: true
+        partialBundledLanguages: true,
+        ns: [], // Start with empty namespaces
+        defaultNS: false // Disable default namespace preloading
       })
       .catch(err => console.error('[i18next] Client initialization failed:', err));
   `;
