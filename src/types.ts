@@ -9,9 +9,13 @@ export interface IntegrationOptions {
   translationsPattern: string;
 }
 
+export type TranslationContent = {
+  [key: string]: string | number | TranslationContent;
+};
+
 export interface TranslationMap {
   [locale: string]: {
-    [namespace: string]: any;
+    [namespace: string]: TranslationContent;
   };
 }
 
@@ -22,4 +26,13 @@ export interface I18nBaseConfig extends InitOptions {
   defaultNS: string;
   fallbackNS: string;
   ns: string[];
+}
+
+// Global type declarations
+declare global {
+  interface Window {
+    __i18nLoadNamespaces?: (namespaces: string[]) => Promise<void>;
+  }
+  
+  const window: Window | undefined;
 }

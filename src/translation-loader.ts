@@ -1,6 +1,10 @@
 import { readFileSync, existsSync } from "fs";
 import { resolve } from "pathe";
-import type { IntegrationOptions, TranslationMap } from "./types";
+import type {
+  IntegrationOptions,
+  TranslationContent,
+  TranslationMap,
+} from "./types";
 
 /**
  * Loads a translation file for a specific locale and namespace
@@ -10,7 +14,7 @@ export function loadTranslation(
   translationsDir: string,
   locale: string,
   namespace: string
-): Record<string, any> {
+): TranslationContent {
   const filePath = resolve(
     srcDir,
     translationsDir,
