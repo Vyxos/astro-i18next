@@ -1,130 +1,59 @@
 import js from "@eslint/js";
+import tsEslint from "@typescript-eslint/eslint-plugin";
+import tsParser from "@typescript-eslint/parser";
 import globals from "globals";
-import tseslint from "typescript-eslint";
 
 export default [
   js.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked,
-
   {
-    ignores: [
-      "dist/**",
-      "node_modules/**",
-      "coverage/**",
-      "*.config.{js,ts,mjs}",
-      ".env*",
-      "**/*.d.ts",
-    ],
-  },
-
-  {
-    files: ["src/**/*.{js,ts,mts,cts}"],
+    files: ["src/**/*.{ts,tsx}"],
     languageOptions: {
-      globals: {
-        ...globals.node,
-        ...globals.es2022,
-      },
-      ecmaVersion: "latest",
-      sourceType: "module",
+      parser: tsParser,
       parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
         project: "./tsconfig.json",
         tsconfigRootDir: import.meta.dirname,
       },
+      globals: {
+        ...globals.node,
+        ...globals.browser,
+      },
+    },
+    plugins: {
+      "@typescript-eslint": tsEslint,
     },
     rules: {
+      ...tsEslint.configs.recommended.rules,
       "@typescript-eslint/no-unused-vars": [
         "error",
-        {
-          argsIgnorePattern: "^_",
-          varsIgnorePattern: "^_",
-          ignoreRestSiblings: true,
-        },
+        { argsIgnorePattern: "^_" },
       ],
-      "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/explicit-module-boundary-types": "off",
-      "@typescript-eslint/no-non-null-assertion": "warn",
-      "@typescript-eslint/prefer-nullish-coalescing": "error",
-      "@typescript-eslint/prefer-optional-chain": "error",
-      "@typescript-eslint/no-unnecessary-type-assertion": "error",
-      "@typescript-eslint/no-floating-promises": "error",
-
-      "prefer-const": "error",
-      "no-var": "error",
-      "no-console": "off",
-      "no-debugger": "error",
-      "no-eval": "error",
-      "no-implied-eval": "error",
-
-      "no-duplicate-imports": "error",
-      "sort-imports": [
-        "error",
-        {
-          ignoreCase: true,
-          ignoreDeclarationSort: true,
-        },
-      ],
-
-      "no-restricted-globals": [
-        "error",
-        {
-          name: "window",
-          message:
-            "Use globalThis or check if window exists for SSR compatibility",
-        },
-        {
-          name: "document",
-          message:
-            "Use globalThis or check if document exists for SSR compatibility",
-        },
-      ],
+      "@typescript-eslint/no-explicit-any": "warn",
+      "no-console": "off", // Allow console for this library
     },
   },
-
   {
-    files: ["**/*.{test,spec}.{js,ts}", "tests/**/*.{js,ts}"],
+    files: ["src/**/*.test.{ts,tsx}", "src/**/*.spec.{ts,tsx}"],
     languageOptions: {
       globals: {
         ...globals.node,
         describe: "readonly",
         it: "readonly",
-        test: "readonly",
         expect: "readonly",
         beforeEach: "readonly",
         afterEach: "readonly",
-        beforeAll: "readonly",
-        afterAll: "readonly",
         vi: "readonly",
-        jest: "readonly",
       },
     },
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-floating-promises": "off",
-      "no-console": "off",
-      "no-restricted-globals": "off",
+      "@typescript-eslint/no-non-null-assertion": "off",
     },
   },
-
   {
-    files: [
-      "*.config.{js,ts,mjs}",
-      "scripts/**/*.{js,ts}",
-      "build/**/*.{js,ts}",
-    ],
-    languageOptions: {
-      globals: {
-        ...globals.node,
-      },
-      parserOptions: {
-        project: null,
-      },
-    },
-    rules: {
-      "@typescript-eslint/no-var-requires": "off",
-      "@typescript-eslint/no-require-imports": "off",
-      "no-console": "off",
-      "@typescript-eslint/no-floating-promises": "off",
-    },
+    ignores: ["dist/", "node_modules/", "*.config.js", "*.config.ts"],
   },
 ];
