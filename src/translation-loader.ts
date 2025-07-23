@@ -1,4 +1,4 @@
-import { readFileSync, existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { resolve } from "pathe";
 import type {
   IntegrationOptions,
@@ -21,15 +21,39 @@ export function loadTranslation(
     `${locale}/${namespace}.json`
   );
 
-  try {
-    if (existsSync(filePath)) {
-      return JSON.parse(readFileSync(filePath, "utf-8"));
-    }
-  } catch {
+  if (!existsSync(filePath)) {
+    console.warn(
+      `[astro-i18next] Translation file not found: ${filePath}\n` +
+        `Expected structure: ${translationsDir}/${locale}/${namespace}.json`
+    );
     return {};
   }
 
-  return {};
+  try {
+    const content = readFileSync(filePath, "utf-8");
+    const parsed = JSON.parse(content) as string;
+
+    // Validate that the parsed content is an object
+    if (
+      typeof parsed !== "object" ||
+      parsed === null ||
+      Array.isArray(parsed)
+    ) {
+      console.error(
+        `[astro-i18next] Invalid translation file format: ${filePath}\n` +
+          `Expected JSON object, got ${typeof parsed}`
+      );
+      return {};
+    }
+
+    return parsed;
+  } catch (error) {
+    console.error(
+      `[astro-i18next] Failed to parse translation file: ${filePath}`,
+      error instanceof Error ? error.message : String(error)
+    );
+    return {};
+  }
 }
 
 /**
