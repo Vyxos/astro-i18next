@@ -8,7 +8,6 @@ function isBrowser(): boolean {
 }
 
 function getGlobalWindow(): Window | undefined {
-  // eslint-disable-next-line no-restricted-globals
   return isBrowser() ? window : undefined;
 }
 
@@ -36,7 +35,7 @@ export async function loadNamespacesForRoute(
 /**
  * React hook for loading namespaces in components (optional usage)
  */
-export function useLoadNamespaces(namespaces: string[]): Promise<void> {
+export async function useLoadNamespaces(namespaces: string[]): Promise<void> {
   const win = getGlobalWindow();
   if (win?.__i18nLoadNamespaces) {
     return win.__i18nLoadNamespaces(namespaces);
