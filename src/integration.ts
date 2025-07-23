@@ -1,9 +1,10 @@
 import type { AstroIntegration } from "astro";
-import type { IntegrationOptions } from "./types";
-import { loadAllTranslations } from "./translation-loader";
 import { createBaseConfig } from "./config";
+import { generateClientScript, generateServerScript } from "./scripts";
+import { loadAllTranslations } from "./translation-loader";
+import type { IntegrationOptions } from "./types";
+import { validateOptions } from "./validation";
 import { createI18nVitePlugin } from "./vite-plugin";
-import { generateServerScript, generateClientScript } from "./scripts";
 
 /**
  * Creates an Astro integration for i18next internationalization
@@ -13,23 +14,34 @@ export function i18nIntegration(options: IntegrationOptions): AstroIntegration {
     name: "astro-i18next",
     hooks: {
       "astro:config:setup": async ({ config, injectScript, updateConfig }) => {
-        const baseConfig = createBaseConfig(options);
-        const allTranslations = loadAllTranslations(
-          config.srcDir.pathname,
-          options
-        );
+        try {
+          validateOptions(options);
 
-        updateConfig({
-          vite: {
-            plugins: [createI18nVitePlugin(options, config.srcDir.pathname)],
-          },
-        });
+          const baseConfig = createBaseConfig(options);
+          const allTranslations = loadAllTranslations(
+            config.srcDir.pathname,
+            options
+          );
 
-        injectScript(
-          "page-ssr",
-          generateServerScript(baseConfig, allTranslations)
-        );
-        injectScript("before-hydration", generateClientScript(baseConfig));
+          updateConfig({
+            vite: {
+              plugins: [createI18nVitePlugin(options, config.srcDir.pathname)],
+            },
+          });
+
+          injectScript(
+            "page-ssr",
+            generateServerScript(baseConfig, allTranslations)
+          );
+          injectScript("before-hydration", generateClientScript(baseConfig));
+        } catch (error) {
+          if (error instanceof Error) {
+            throw new Error(
+              `[astro-i18next] Configuration error: ${error.message}`
+            );
+          }
+          throw error;
+        }
       },
     },
   };
