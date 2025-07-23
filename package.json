@@ -6,6 +6,9 @@
   "private": false,
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -65,9 +68,14 @@
   },
   "keywords": [
     "astro",
+    "astro-integration",
     "i18n",
+    "i18next",
     "internationalization",
-    "typescript"
+    "localization",
+    "typescript",
+    "dynamic-loading",
+    "performance"
   ],
   "repository": {
     "type": "git",
