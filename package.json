@@ -109,5 +109,19 @@
   "homepage": "https://github.com/vyxos/astro-i18next#readme",
   "publishConfig": {
     "access": "public"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
   }
 }
