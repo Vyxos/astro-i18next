@@ -1,3 +1,5 @@
+import { IntegrationOptions } from "./types";
+
 export class I18nConfigError extends Error {
   constructor(
     message: string,
@@ -8,7 +10,7 @@ export class I18nConfigError extends Error {
   }
 }
 
-export function validateOptions(options: any): void {
+export function validateOptions(options: IntegrationOptions): void {
   if (!options) {
     throw new I18nConfigError("Integration options are required");
   }
@@ -75,7 +77,7 @@ export function validateOptions(options: any): void {
 
   // Validate locale format (basic check)
   const invalidLocales = options.locales.filter(
-    (locale: any) =>
+    (locale: string) =>
       typeof locale !== "string" || !/^[a-z]{2}(-[A-Z]{2})?$/.test(locale)
   );
   if (invalidLocales.length > 0) {
@@ -87,7 +89,7 @@ export function validateOptions(options: any): void {
 
   // Validate namespace format (no special characters that could break file paths)
   const invalidNamespaces = options.namespaces.filter(
-    (ns: any) => typeof ns !== "string" || !/^[a-zA-Z0-9_-]+$/.test(ns)
+    (ns: string) => typeof ns !== "string" || !/^[a-zA-Z0-9_-]+$/.test(ns)
   );
   if (invalidNamespaces.length > 0) {
     throw new I18nConfigError(
