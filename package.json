@@ -1,8 +1,12 @@
 {
   "name": "@vyxos/astro-i18next",
   "version": "0.1.3",
-  "description": "i18n integration for Astro",
-  "author": "Marek Fodor",
+  "description": "I18next integration for Astro with dynamic namespace loading.",
+  "author": {
+    "name": "Marek Fodor",
+    "email": "development@vyxos.eu",
+    "url": "https://github.com/vyxos"
+  },
   "private": false,
   "license": "MIT",
   "type": "module",
