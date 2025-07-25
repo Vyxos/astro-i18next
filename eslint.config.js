@@ -1,6 +1,7 @@
 import js from "@eslint/js";
 import tsEslint from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
+import prettierConfig from "eslint-plugin-prettier/recommended";
 import globals from "globals";
 
 export default [
@@ -56,4 +57,5 @@ export default [
   {
     ignores: ["dist/", "node_modules/", "*.config.js", "*.config.ts"],
   },
+  prettierConfig,
 ];
