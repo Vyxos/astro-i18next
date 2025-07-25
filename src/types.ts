@@ -32,7 +32,9 @@ export interface I18nBaseConfig extends InitOptions {
 declare global {
   interface Window {
     __i18nLoadNamespaces?: (namespaces: string[]) => Promise<void>;
+    __astroI18nConfig?: IntegrationOptions;
   }
 
   const window: Window | undefined;
+  var __astroI18nConfig: IntegrationOptions | undefined;
 }

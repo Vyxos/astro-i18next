@@ -31,9 +31,12 @@ export function i18nIntegration(options: IntegrationOptions): AstroIntegration {
 
           injectScript(
             "page-ssr",
-            generateServerScript(baseConfig, allTranslations)
+            generateServerScript(baseConfig, allTranslations, options)
           );
-          injectScript("before-hydration", generateClientScript(baseConfig));
+          injectScript(
+            "before-hydration",
+            generateClientScript(baseConfig, options)
+          );
         } catch (error) {
           if (error instanceof Error) {
             throw new Error(

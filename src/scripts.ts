@@ -1,16 +1,22 @@
-import type { I18nBaseConfig, TranslationMap } from "./types";
+import type {
+  I18nBaseConfig,
+  IntegrationOptions,
+  TranslationMap,
+} from "./types";
 
 /**
  * Generates the server-side initialization script
  */
 export function generateServerScript(
   baseConfig: I18nBaseConfig,
-  allTranslations: TranslationMap
+  allTranslations: TranslationMap,
+  options: IntegrationOptions
 ): string {
   return `
     import i18next from "i18next";
     
     const resources = ${JSON.stringify(allTranslations)};
+    globalThis.__astroI18nConfig = ${JSON.stringify(options)};
     
     i18next.init({
       ...${JSON.stringify(baseConfig)},
@@ -23,10 +29,14 @@ export function generateServerScript(
 /**
  * Generates the client-side initialization script with on-demand loading
  */
-export function generateClientScript(baseConfig: I18nBaseConfig): string {
+export function generateClientScript(
+  baseConfig: I18nBaseConfig,
+  options: IntegrationOptions
+): string {
   return `
     import i18next from "i18next";
     import LanguageDetector from "i18next-browser-languagedetector";
+    window.__astroI18nConfig = ${JSON.stringify(options)};
     
     const dynamicBackend = {
       type: 'backend',
