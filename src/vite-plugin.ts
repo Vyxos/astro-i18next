@@ -1,5 +1,5 @@
-import type { IntegrationOptions } from "./types";
 import { loadTranslation } from "./translation-loader";
+import type { IntegrationOptions } from "./types";
 
 /**
  * Creates a Vite plugin for handling i18n virtual modules
@@ -16,10 +16,11 @@ export function createI18nVitePlugin(
 
       const match = id.match(/^virtual:i18n-translation:(.+)\/(.+)$/);
       if (match) return id;
-      
+
       // Handle generated virtual modules
       const virtualMatch = id.match(/^\.?\/virtual-i18n-(.+)-(.+)\.js$/);
-      if (virtualMatch) return `virtual:i18n-translation:${virtualMatch[1]}/${virtualMatch[2]}`;
+      if (virtualMatch)
+        return `virtual:i18n-translation:${virtualMatch[1]}/${virtualMatch[2]}`;
     },
     load(id: string) {
       if (id === "virtual:i18n-config") {
@@ -52,20 +53,24 @@ function generateDynamicTranslationLoader(options: IntegrationOptions): string {
 
   options.locales.forEach((locale) => {
     options.namespaces.forEach((namespace) => {
-      const importVar = `${locale}_${namespace}`.replace(/[^a-zA-Z0-9_]/g, '_');
-      importMap.push(`const ${importVar} = () => import('./virtual-i18n-${locale}-${namespace}.js');`);
-      caseStatements.push(`    case '${locale}/${namespace}': return (await ${importVar}()).default || {};`);
+      const importVar = `${locale}_${namespace}`.replace(/[^a-zA-Z0-9_]/g, "_");
+      importMap.push(
+        `const ${importVar} = () => import('./virtual-i18n-${locale}-${namespace}.js');`
+      );
+      caseStatements.push(
+        `    case '${locale}/${namespace}': return (await ${importVar}()).default || {};`
+      );
     });
   });
 
   return `
-${importMap.join('\n')}
+${importMap.join("\n")}
 
 export async function loadTranslation(locale, namespace) {
   try {
     const key = \`\${locale}/\${namespace}\`;
     switch (key) {
-${caseStatements.join('\n')}
+${caseStatements.join("\n")}
       default:
         console.warn(\`[i18next] Unknown translation: \${locale}/\${namespace}\`);
         return {};

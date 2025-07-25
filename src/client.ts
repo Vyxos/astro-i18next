@@ -5,8 +5,8 @@
 
 export {
   loadNamespacesForRoute,
-  useLoadNamespaces,
   preloadNamespaces,
+  useLoadNamespaces,
 } from "./router-integration";
 
 export type { IntegrationOptions } from "./types";

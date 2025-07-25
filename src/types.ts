@@ -33,6 +33,6 @@ declare global {
   interface Window {
     __i18nLoadNamespaces?: (namespaces: string[]) => Promise<void>;
   }
-  
+
   const window: Window | undefined;
 }
