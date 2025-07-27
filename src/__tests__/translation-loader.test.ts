@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { writeFileSync, mkdirSync, rmSync } from "fs";
-import { loadTranslation, loadAllTranslations } from "../translation-loader";
+import { mkdirSync, rmSync, writeFileSync } from "fs";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { loadAllTranslations, loadTranslation } from "../translation-loader";
 import type { IntegrationOptions } from "../types";
 
 describe("loadTranslation", () => {

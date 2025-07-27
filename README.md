@@ -1,5 +1,7 @@
 # @vyxos/astro-i18next
 
+# STATUS: ALPHA
+
 High-performance i18n integration for Astro with dynamic namespace loading and TanStack Router support.
 
 ## Key Features
@@ -33,7 +35,6 @@ export default defineConfig({
       namespaces: ["common", "auth", "dashboard", "forms"],
       defaultNamespace: "common",
       translationsDir: "src/translations",
-      translationsPattern: "{{lng}}/{{ns}}.json",
     }),
   ],
 });
@@ -163,7 +164,6 @@ interface IntegrationOptions {
   namespaces: string[]; // Available namespaces
   defaultNamespace: string; // Default namespace
   translationsDir: string; // Path to translation files
-  translationsPattern: string; // File naming pattern
 }
 ```
 
