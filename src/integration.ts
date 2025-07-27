@@ -1,5 +1,6 @@
 import type { AstroIntegration } from "astro";
 import { createBaseConfig } from "./config";
+import { INTEGRATION_NAME } from "./constants";
 import { generateClientScript, generateServerScript } from "./scripts";
 import { loadAllTranslations } from "./translation-loader";
 import type { IntegrationOptions } from "./types";
@@ -11,7 +12,7 @@ import { createI18nVitePlugin } from "./vite-plugin";
  */
 export function i18nIntegration(options: IntegrationOptions): AstroIntegration {
   return {
-    name: "astro-i18next",
+    name: INTEGRATION_NAME,
     hooks: {
       "astro:config:setup": async ({ config, injectScript, updateConfig }) => {
         try {
@@ -40,7 +41,7 @@ export function i18nIntegration(options: IntegrationOptions): AstroIntegration {
         } catch (error) {
           if (error instanceof Error) {
             throw new Error(
-              `[astro-i18next] Configuration error: ${error.message}`
+              `[${INTEGRATION_NAME}] Configuration error: ${error.message}`
             );
           }
           throw error;

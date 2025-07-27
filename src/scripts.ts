@@ -1,3 +1,4 @@
+import { INTEGRATION_NAME } from "./constants";
 import type {
   I18nBaseConfig,
   IntegrationOptions,
@@ -22,7 +23,7 @@ export function generateServerScript(
       ...${JSON.stringify(baseConfig)},
       resources,
       initImmediate: false
-    }).catch(err => console.error('[i18next] Server initialization failed:', err));
+    }).catch(err => console.error('[${INTEGRATION_NAME}] Server initialization failed:', err));
   `;
 }
 
@@ -47,7 +48,7 @@ export function generateClientScript(
           const data = await loadTranslation(language, namespace);
           callback(null, data);
         } catch (err) {
-          console.warn(\`[i18next] Failed to load \${language}/\${namespace}:\`, err);
+          console.warn(\`[${INTEGRATION_NAME}] Failed to load \${language}/\${namespace}:\`, err);
           callback(null, {});
         }
       }
@@ -84,6 +85,6 @@ export function generateClientScript(
         ns: [], // Start with empty namespaces
         defaultNS: false // Disable default namespace preloading
       })
-      .catch(err => console.error('[i18next] Client initialization failed:', err));
+      .catch(err => console.error('[${INTEGRATION_NAME}] Client initialization failed:', err));
   `;
 }

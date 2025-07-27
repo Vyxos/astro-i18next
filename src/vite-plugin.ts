@@ -1,3 +1,4 @@
+import { INTEGRATION_NAME } from "./constants";
 import { loadTranslation } from "./translation-loader";
 import type { IntegrationOptions } from "./types";
 
@@ -72,11 +73,11 @@ export async function loadTranslation(locale, namespace) {
     switch (key) {
 ${caseStatements.join("\n")}
       default:
-        console.warn(\`[i18next] Unknown translation: \${locale}/\${namespace}\`);
+        console.warn(\`[${INTEGRATION_NAME}] Unknown translation: \${locale}/\${namespace}\`);
         return {};
     }
   } catch (err) {
-    console.warn(\`[i18next] Failed to load translation \${locale}/\${namespace}:\`, err);
+    console.warn(\`[${INTEGRATION_NAME}] Failed to load translation \${locale}/\${namespace}:\`, err);
     return {};
   }
 }

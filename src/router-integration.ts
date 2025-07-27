@@ -1,6 +1,4 @@
-/**
- * TanStack Router integration utilities for namespace loading
- */
+import { INTEGRATION_NAME } from "./constants";
 
 // Browser environment check
 function isBrowser(): boolean {
@@ -27,7 +25,11 @@ export async function loadNamespacesForRoute(
     try {
       await win.__i18nLoadNamespaces(namespaces);
     } catch (error: unknown) {
-      console.warn("[i18next] Failed to load namespaces:", namespaces, error);
+      console.warn(
+        `[${INTEGRATION_NAME}] Failed to load namespaces:`,
+        namespaces,
+        error
+      );
     }
   }
 }
@@ -52,7 +54,7 @@ export function preloadNamespaces(namespaces: string[]): void {
     win
       .__i18nLoadNamespaces(namespaces)
       .catch((error: unknown) =>
-        console.warn("[i18next] Preload failed:", namespaces, error)
+        console.warn(`[${INTEGRATION_NAME}] Preload failed:`, namespaces, error)
       );
   }
 }
