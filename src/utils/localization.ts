@@ -1,4 +1,7 @@
-import { getConfigOptions } from "./config";
+/// <reference lib="dom" />
+import i18next from "i18next";
+import { INTEGRATION_NAME } from "../constants";
+import { getLocaleConfig } from "../utils";
 
 /**
  * Generates a localized URL pathname based on a given path and target locale.
@@ -24,7 +27,7 @@ import { getConfigOptions } from "./config";
  * @since 0.1.5
  */
 export function getLocalizedPathname(pathname: string, locale: string = "") {
-  const { defaultLocale, locales } = getConfigOptions();
+  const { defaultLocale, locales } = getLocaleConfig();
   const localeFromPathname = pathname.split("/")[1];
   let localizedPathname = pathname;
 
@@ -41,4 +44,62 @@ export function getLocalizedPathname(pathname: string, locale: string = "") {
   }
 
   return localizedPathname;
+}
+
+/**
+ * Changes the current locale of the application and updates the URL accordingly.
+ *
+ * This function first checks if the `nextLocale` is supported by the application.
+ * If it is, it updates the `i18next` instance to the new locale and then
+ * constructs a new URL pathname using `getLocalizedPathname`.
+ *
+ * The URL is updated using `history.replaceState` for a shallow update (no page reload)
+ * or `window.location.replace` for a full page reload, depending on the `shallow` parameter.
+ *
+ * @param {string} [nextLocale=""] - The target locale code to switch to (e.g., "fr").
+ * If an unsupported locale is provided, the function will do nothing.
+ * @param {boolean} [shallow=true] - If `true`, uses `history.replaceState` to update the URL
+ * without a full page reload. If `false`, uses `window.location.replace` which causes a full page reload.
+ *
+ * @example
+ * ```typescript
+ * // Change locale to French without a full page reload
+ * changeLocale("fr");
+ *
+ * // Change locale to German with a full page reload
+ * changeLocale("de", false);
+ * ```
+ *
+ * @see {@link getLocalizedPathname}
+ * @since 0.2.0
+ */
+export function changeLocale(nextLocale: string = "", shallow: boolean = true) {
+  const { locales } = getLocaleConfig();
+
+  if (!locales.includes(nextLocale)) {
+    return;
+  }
+
+  i18next.changeLanguage(nextLocale);
+
+  if (typeof window === "undefined") {
+    console.error(
+      `[${INTEGRATION_NAME}] Trying to access client-only function in server environment.`
+    );
+
+    return;
+  }
+
+  const { hash, pathname, search } = window.location;
+  const nextPathname = getLocalizedPathname(pathname, nextLocale);
+
+  if (nextPathname !== pathname) {
+    const nextUrl = nextPathname + search + hash;
+
+    if (shallow) {
+      window.history.replaceState(null, "", nextUrl);
+    } else {
+      window.location.replace(nextUrl);
+    }
+  }
 }

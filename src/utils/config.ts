@@ -17,13 +17,13 @@ import { IntegrationOptions } from "../types";
  *
  * @since 0.1.5
  */
-export function getConfigOptions(): IntegrationOptions {
-  // Try browser environment first
+export function getLocaleConfig(): IntegrationOptions {
+  // browser environment
   if (typeof window !== "undefined" && window.__astroI18nConfig) {
     return window.__astroI18nConfig;
   }
 
-  // Try Node.js global environment
+  // Node.js global environment
   if (typeof globalThis !== "undefined" && globalThis.__astroI18nConfig) {
     return globalThis.__astroI18nConfig;
   }
