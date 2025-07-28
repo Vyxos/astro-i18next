@@ -1,7 +1,8 @@
 import type { AstroIntegration } from "astro";
 import { createBaseConfig } from "./config";
 import { INTEGRATION_NAME } from "./constants";
-import { generateClientScript, generateServerScript } from "./scripts";
+import { generateClientScript } from "./scripts/client";
+import { generateServerScript } from "./scripts/server";
 import { loadAllTranslations } from "./translation-loader";
 import type { IntegrationOptions } from "./types";
 import { validateOptions } from "./validation";
