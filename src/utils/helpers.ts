@@ -1,4 +1,6 @@
-import { IntegrationOptions } from "../types";
+import i18next from "i18next";
+import { IntegrationOptions } from "../client";
+import { INTEGRATION_NAME } from "../constants";
 
 /**
  * Retrieves the current locale configuration for the astro-i18next integration.
@@ -18,18 +20,11 @@ import { IntegrationOptions } from "../types";
  * @since 0.1.5
  */
 export function getLocaleConfig(): IntegrationOptions {
-  // browser environment
-  if (typeof window !== "undefined" && window.__astroI18nConfig) {
-    return window.__astroI18nConfig;
+  if (!i18next.options.integrationOptions) {
+    throw new Error(`[${INTEGRATION_NAME}] Configuration object empty.`);
   }
 
-  // Node.js global environment
-  if (typeof globalThis !== "undefined" && globalThis.__astroI18nConfig) {
-    return globalThis.__astroI18nConfig;
-  }
-
-  // Fallback - this should not happen in a properly configured setup
-  throw new Error(
-    "[astro-i18next] Configuration not available. Make sure the integration is properly configured."
-  );
+  return JSON.parse(
+    JSON.stringify(i18next.options.integrationOptions)
+  ) as typeof i18next.options.integrationOptions;
 }
