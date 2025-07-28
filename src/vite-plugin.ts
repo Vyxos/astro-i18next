@@ -1,6 +1,6 @@
 import { INTEGRATION_NAME } from "./constants";
 import { loadTranslation } from "./translation-loader";
-import type { IntegrationOptions } from "./types";
+import type { IntegrationOptions } from "./types/integration";
 
 /**
  * Creates a Vite plugin for handling i18n virtual modules
