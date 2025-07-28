@@ -1,4 +1,4 @@
-import type { IntegrationOptions, I18nBaseConfig } from "./types";
+import type { I18nBaseConfig, IntegrationOptions } from "./types/integration";
 
 /**
  * Creates the base i18next configuration
