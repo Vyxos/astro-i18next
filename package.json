@@ -90,6 +90,7 @@
     "eslint-plugin-prettier": "^5.5.3",
     "globals": "^16.3.0",
     "husky": "^9.0.0",
+    "i18next-resources-for-ts": "^1.6.0",
     "lint-staged": "^15.0.0",
     "prettier": "^3.0.0",
     "tsup": "^8.0.0",
