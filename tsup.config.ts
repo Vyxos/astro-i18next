@@ -13,6 +13,6 @@ export default defineConfig({
   splitting: false,
   treeshake: true,
   minify: false,
-  external: ["astro"],
+  external: ["astro", "react"],
   cjsInterop: true,
 });
