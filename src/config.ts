@@ -40,7 +40,7 @@ export function mergeOptionsWithDefaults(
 
 export const defaultOptions: DefaultIntegrationOptions = {
   generatedTypes: {
-    dirPath: "./types",
+    dirPath: "types",
     fileName: "i18next-resources",
   },
   translationsDir: "",
