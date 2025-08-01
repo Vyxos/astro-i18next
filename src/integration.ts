@@ -15,7 +15,12 @@ export function i18nIntegration(options: IntegrationOptions): AstroIntegration {
   return {
     name: INTEGRATION_NAME,
     hooks: {
-      "astro:config:setup": async ({ config, injectScript, updateConfig }) => {
+      "astro:config:setup": async ({
+        config,
+        injectScript,
+        updateConfig,
+        addMiddleware,
+      }) => {
         try {
           validateOptions(options);
           const safeOptions = mergeOptionsWithDefaults(options);
@@ -42,6 +47,11 @@ export function i18nIntegration(options: IntegrationOptions): AstroIntegration {
             "before-hydration",
             generateClientScript(baseConfig, safeOptions)
           );
+
+          addMiddleware({
+            entrypoint: `${INTEGRATION_NAME}/middleware`,
+            order: "post",
+          });
         } catch (error) {
           if (error instanceof Error) {
             throw new Error(

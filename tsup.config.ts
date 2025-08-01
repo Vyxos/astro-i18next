@@ -5,6 +5,7 @@ export default defineConfig({
     index: "src/index.ts",
     client: "src/client.ts",
     utils: "src/utils.ts",
+    middleware: "src/middleware.ts",
   },
   format: ["cjs", "esm"],
   dts: true,
