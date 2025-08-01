@@ -49,6 +49,7 @@ export function generateClientScript(
       .use(dynamicBackend)
       .init({
         ...${JSON.stringify(baseConfig)},
+        fallbackLng: false,
         initImmediate: true,
         detection: {
           order: ["htmlTag", "path"],
@@ -60,6 +61,35 @@ export function generateClientScript(
         ns: [], 
         defaultNS: false,
         integrationOptions: ${JSON.stringify(options)}
+      }).then(() => {
+        const originalT = i18next.t;
+
+        i18next.t = function (...args) {
+          const key = args[0];
+          const lastArg = args[args.length - 1];
+          const options = typeof lastArg === 'object' && lastArg !== null ? lastArg : undefined;
+          let namespace;
+
+          if (typeof key === 'string' && key.includes(':')) {
+            namespace = key.split(':')[0];
+          } else if (options && 'ns' in options && typeof options.ns === 'string') {
+            namespace = options.ns;
+          }
+
+          if (namespace) {
+            const currentLanguage = i18next.language;
+            if (!i18next.hasResourceBundle(currentLanguage, namespace)) {
+              console.warn(
+                \`[${INTEGRATION_NAME}] Warning: Translation key "\${String(key)}" is being accessed \` +
+                \`for namespace "\${namespace}" in locale "\${currentLanguage}", \` +
+                \`but this namespace is not currently loaded. Ensure '\${namespace}' is loaded \` +
+                \`using 'loadNamespacesForRoute' or 'useLoadNamespaces'.\`
+              );
+            }
+          }
+
+          return originalT.apply(this, args);
+        };
       })
       .catch(err => console.error('[${INTEGRATION_NAME}] Client initialization failed:', err));
   `;
