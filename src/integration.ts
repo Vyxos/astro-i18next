@@ -5,6 +5,7 @@ import { generateClientScript } from "./scripts/client";
 import { generateServerScript } from "./scripts/server";
 import { loadAllTranslations } from "./translation-loader";
 import type { IntegrationOptions } from "./types/integration";
+import { generateTypescriptDefinitions } from "./utils/type-generation";
 import { validateOptions } from "./validation";
 import { createI18nVitePlugin } from "./vite-plugin";
 
@@ -46,6 +47,12 @@ export function i18nIntegration(options: IntegrationOptions): AstroIntegration {
           injectScript(
             "before-hydration",
             generateClientScript(baseConfig, safeOptions)
+          );
+
+          generateTypescriptDefinitions(
+            allTranslations,
+            config.srcDir.pathname,
+            safeOptions
           );
 
           addMiddleware({
