@@ -1,5 +1,8 @@
 import { INTEGRATION_NAME } from "../constants";
-import type { I18nBaseConfig, IntegrationOptions } from "../types/integration";
+import type {
+  I18nBaseConfig,
+  IntegrationOptionsInternal,
+} from "../types/integration";
 import type { TranslationMap } from "../types/translations";
 
 /**
@@ -8,7 +11,7 @@ import type { TranslationMap } from "../types/translations";
 export function generateServerScript(
   baseConfig: Partial<I18nBaseConfig>,
   allTranslations: TranslationMap,
-  options: IntegrationOptions
+  options: IntegrationOptionsInternal
 ): string {
   return `
     import i18next from "i18next";

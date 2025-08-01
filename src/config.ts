@@ -1,9 +1,16 @@
-import type { I18nBaseConfig, IntegrationOptions } from "./types/integration";
+import type {
+  DefaultIntegrationOptions,
+  I18nBaseConfig,
+  IntegrationOptions,
+  IntegrationOptionsInternal,
+} from "./types/integration";
 
 /**
  * Creates the base i18next configuration
  */
-export function createBaseConfig(options: IntegrationOptions): I18nBaseConfig {
+export function createI18nextConfig(
+  options: IntegrationOptionsInternal
+): Partial<I18nBaseConfig> {
   return {
     lng: options.defaultLocale,
     fallbackLng: options.defaultLocale,
@@ -13,3 +20,28 @@ export function createBaseConfig(options: IntegrationOptions): I18nBaseConfig {
     ns: [options.defaultNamespace],
   };
 }
+
+export function mergeOptionsWithDefaults(
+  options: IntegrationOptions
+): IntegrationOptionsInternal {
+  return {
+    ...options,
+    translationsDir: options.translationsDir ?? defaultOptions.translationsDir,
+    generatedTypes: {
+      dirPath:
+        options?.generatedTypes?.dirPath ??
+        defaultOptions.generatedTypes.dirPath,
+      fileName:
+        options?.generatedTypes?.fileName ??
+        defaultOptions.generatedTypes.fileName,
+    },
+  };
+}
+
+export const defaultOptions: DefaultIntegrationOptions = {
+  generatedTypes: {
+    dirPath: "./types",
+    fileName: "i18next-resources",
+  },
+  translationsDir: "",
+};

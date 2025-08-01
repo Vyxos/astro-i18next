@@ -1,4 +1,4 @@
-import { IntegrationOptions } from "./types";
+import { IntegrationOptions } from "./types/integration";
 
 export class I18nConfigError extends Error {
   constructor(

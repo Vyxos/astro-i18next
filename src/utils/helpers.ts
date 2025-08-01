@@ -1,6 +1,6 @@
 import i18next from "i18next";
-import { IntegrationOptions } from "../client";
 import { INTEGRATION_NAME } from "../constants";
+import { IntegrationOptionsInternal } from "../types/integration";
 
 /**
  * Retrieves the current locale configuration for the astro-i18next integration.
@@ -19,7 +19,7 @@ import { INTEGRATION_NAME } from "../constants";
  *
  * @since 0.1.5
  */
-export function getLocaleConfig(): IntegrationOptions {
+export function getLocaleConfig(): IntegrationOptionsInternal {
   if (!i18next.options.integrationOptions) {
     throw new Error(`[${INTEGRATION_NAME}] Configuration object empty.`);
   }

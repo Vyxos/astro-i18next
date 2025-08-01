@@ -1,10 +1,10 @@
 import type { AstroIntegration } from "astro";
-import { createBaseConfig } from "./config";
+import { createI18nextConfig, mergeOptionsWithDefaults } from "./config";
 import { INTEGRATION_NAME } from "./constants";
 import { generateClientScript } from "./scripts/client";
 import { generateServerScript } from "./scripts/server";
 import { loadAllTranslations } from "./translation-loader";
-import type { IntegrationOptions } from "./types";
+import type { IntegrationOptions } from "./types/integration";
 import { validateOptions } from "./validation";
 import { createI18nVitePlugin } from "./vite-plugin";
 
@@ -18,26 +18,29 @@ export function i18nIntegration(options: IntegrationOptions): AstroIntegration {
       "astro:config:setup": async ({ config, injectScript, updateConfig }) => {
         try {
           validateOptions(options);
+          const safeOptions = mergeOptionsWithDefaults(options);
 
-          const baseConfig = createBaseConfig(options);
+          const baseConfig = createI18nextConfig(safeOptions);
           const allTranslations = loadAllTranslations(
             config.srcDir.pathname,
-            options
+            safeOptions
           );
 
           updateConfig({
             vite: {
-              plugins: [createI18nVitePlugin(options, config.srcDir.pathname)],
+              plugins: [
+                createI18nVitePlugin(safeOptions, config.srcDir.pathname),
+              ],
             },
           });
 
           injectScript(
             "page-ssr",
-            generateServerScript(baseConfig, allTranslations, options)
+            generateServerScript(baseConfig, allTranslations, safeOptions)
           );
           injectScript(
             "before-hydration",
-            generateClientScript(baseConfig, options)
+            generateClientScript(baseConfig, safeOptions)
           );
         } catch (error) {
           if (error instanceof Error) {

@@ -1,12 +1,15 @@
 import { INTEGRATION_NAME } from "../constants";
-import { I18nBaseConfig, IntegrationOptions } from "../types/integration";
+import {
+  I18nBaseConfig,
+  IntegrationOptionsInternal,
+} from "../types/integration";
 
 /**
  * Generates the client-side initialization script with on-demand loading
  */
 export function generateClientScript(
   baseConfig: Partial<I18nBaseConfig>,
-  options: IntegrationOptions
+  options: IntegrationOptionsInternal
 ): string {
   return `
     import i18next from "i18next";

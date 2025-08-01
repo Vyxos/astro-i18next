@@ -1,10 +1,7 @@
 import { existsSync, readFileSync } from "fs";
 import { resolve } from "pathe";
-import type {
-  IntegrationOptions,
-  TranslationContent,
-  TranslationMap,
-} from "./types";
+import { IntegrationOptionsInternal } from "./types/integration";
+import type { TranslationContent, TranslationMap } from "./types/translations";
 
 /**
  * Loads a translation file for a specific locale and namespace
@@ -61,7 +58,7 @@ export function loadTranslation(
  */
 export function loadAllTranslations(
   srcDir: string,
-  options: IntegrationOptions
+  options: IntegrationOptionsInternal
 ): TranslationMap {
   const allTranslations: TranslationMap = {};
 

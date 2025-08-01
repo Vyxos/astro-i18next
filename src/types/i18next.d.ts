@@ -13,6 +13,7 @@ declare module "i18next" {
       | "defaultNamespace"
       | "namespaces"
       | "translationsDir"
+      | "generatedTypes"
     >;
   }
 }

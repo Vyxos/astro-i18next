@@ -1,12 +1,12 @@
 import { INTEGRATION_NAME } from "./constants";
 import { loadTranslation } from "./translation-loader";
-import type { IntegrationOptions } from "./types/integration";
+import type { IntegrationOptionsInternal } from "./types/integration";
 
 /**
  * Creates a Vite plugin for handling i18n virtual modules
  */
 export function createI18nVitePlugin(
-  options: IntegrationOptions,
+  options: IntegrationOptionsInternal,
   srcDir: string
 ) {
   return {
@@ -47,8 +47,9 @@ export function createI18nVitePlugin(
   };
 }
 
-function generateDynamicTranslationLoader(options: IntegrationOptions): string {
-  // Generate import mapping for all locale/namespace combinations
+function generateDynamicTranslationLoader(
+  options: IntegrationOptionsInternal
+): string {
   const importMap: string[] = [];
   const caseStatements: string[] = [];
 
