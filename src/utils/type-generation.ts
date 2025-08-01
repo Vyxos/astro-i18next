@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import { mergeResourcesAsInterface } from "i18next-resources-for-ts";
 import { join } from "node:path";
+import { resolve } from "pathe";
 import { INTEGRATION_NAME } from "../constants";
 import { IntegrationOptionsInternal } from "../types/integration";
 import { TranslationMap } from "../types/translations";
@@ -24,7 +25,7 @@ export function generateTypescriptDefinitions(
 ) {
   try {
     const INTERFACE_OUTPUT_FILE = join(
-      outputDirPath,
+      resolve(outputDirPath, options.generatedTypes.dirPath),
       `${options.generatedTypes.fileName}.d.ts`
     );
 
