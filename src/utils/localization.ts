@@ -1,6 +1,6 @@
 /// <reference lib="dom" />
 import i18next from "i18next";
-import { INTEGRATION_NAME } from "../constants";
+import { logError } from "../logger";
 import { getLocaleConfig } from "../utils";
 
 /**
@@ -83,9 +83,7 @@ export function changeLocale(nextLocale: string = "", shallow: boolean = true) {
   i18next.changeLanguage(nextLocale);
 
   if (typeof window === "undefined") {
-    console.error(
-      `[${INTEGRATION_NAME}] Trying to access client-only function in server environment.`
-    );
+    logError(`Trying to access client-only function in server environment.`);
 
     return;
   }

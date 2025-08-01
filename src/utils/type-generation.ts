@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import { mergeResourcesAsInterface } from "i18next-resources-for-ts";
 import { join } from "node:path";
-import { resolve } from "pathe";
-import { INTEGRATION_NAME } from "../constants";
+import { relative, resolve } from "pathe";
+import { log } from "../logger";
 import { IntegrationOptionsInternal } from "../types/integration";
 import { TranslationMap } from "../types/translations";
 
@@ -46,17 +46,17 @@ declare module "i18next" {
 ${typeDefinitionFile}
 `;
 
+    const namespacesLength = Object.keys(Object.values(namespaces)[0]).length;
+    const RELATIVE_OUTPUT_PATH = relative(process.cwd(), INTERFACE_OUTPUT_FILE);
     fs.writeFileSync(INTERFACE_OUTPUT_FILE, final, {
       encoding: "utf-8",
       flag: "w",
     });
 
-    console.log(
-      `[${INTEGRATION_NAME}] Successfully created interface resources file for ${namespaces.length} namespaces: ${INTERFACE_OUTPUT_FILE}`
+    log(
+      `Created interface file for ${namespacesLength !== undefined ? namespacesLength : 0} namespaces: ${RELATIVE_OUTPUT_PATH}`
     );
   } catch (error) {
-    console.log(
-      `[${INTEGRATION_NAME}]  Failed to create interface resources file: ${error}`
-    );
+    log(` Failed to create interface resources file: ${error}`);
   }
 }

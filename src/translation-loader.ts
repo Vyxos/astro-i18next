@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "fs";
 import { resolve } from "pathe";
 import { INTEGRATION_NAME } from "./constants";
+import { logError } from "./logger";
 import { IntegrationOptionsInternal } from "./types/integration";
 import type { TranslationContent, TranslationMap } from "./types/translations";
 
@@ -37,8 +38,8 @@ export function loadTranslation(
       parsed === null ||
       Array.isArray(parsed)
     ) {
-      console.error(
-        `[${INTEGRATION_NAME}] Invalid translation file format: ${filePath}\n` +
+      logError(
+        `Invalid translation file format: ${filePath}\n` +
           `Expected JSON object, got ${typeof parsed}`
       );
       return {};
@@ -46,9 +47,8 @@ export function loadTranslation(
 
     return parsed;
   } catch (error) {
-    console.error(
-      `[${INTEGRATION_NAME}] Failed to parse translation file: ${filePath}`,
-      error instanceof Error ? error.message : String(error)
+    logError(
+      `Failed to parse translation file: ${filePath}. Original error: ${error instanceof Error ? error.message : String(error)}`
     );
     return {};
   }
