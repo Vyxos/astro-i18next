@@ -1,1 +1,1 @@
-export const INTEGRATION_NAME = "astro-i18next";
+export const INTEGRATION_NAME = "@vyxos/astro-i18next";

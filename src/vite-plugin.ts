@@ -12,7 +12,6 @@ export function createI18nVitePlugin(
   return {
     name: "i18n-virtual-modules",
     resolveId(id: string) {
-      if (id === "virtual:i18n-config") return id;
       if (id === "virtual:i18n-loader") return id;
 
       const match = id.match(/^virtual:i18n-translation:(.+)\/(.+)$/);
@@ -24,10 +23,6 @@ export function createI18nVitePlugin(
         return `virtual:i18n-translation:${virtualMatch[1]}/${virtualMatch[2]}`;
     },
     load(id: string) {
-      if (id === "virtual:i18n-config") {
-        return `export const i18nConfig = ${JSON.stringify(options)};`;
-      }
-
       if (id === "virtual:i18n-loader") {
         return generateDynamicTranslationLoader(options);
       }
