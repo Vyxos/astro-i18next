@@ -7,4 +7,4 @@ export {
   loadNamespacesForRoute,
   preloadNamespaces,
   useLoadNamespaces,
-} from "./router-integration";
+} from "./client/load-functions";

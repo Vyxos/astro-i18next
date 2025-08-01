@@ -28,3 +28,12 @@ export function getLocaleConfig(): IntegrationOptionsInternal {
     JSON.stringify(i18next.options.integrationOptions)
   ) as typeof i18next.options.integrationOptions;
 }
+
+// Browser environment check
+function isBrowser(): boolean {
+  return typeof globalThis !== "undefined" && "window" in globalThis;
+}
+
+export function getGlobalObject() {
+  return isBrowser() ? globalThis : undefined;
+}
