@@ -1,4 +1,3 @@
-import { INTEGRATION_NAME } from "../constants";
 import {
   I18nBaseConfig,
   IntegrationOptionsInternal,
@@ -24,7 +23,7 @@ export function generateClientScript(
           const data = await loadTranslation(language, namespace);
           callback(null, data);
         } catch (err) {
-          console.warn(\`[${INTEGRATION_NAME}] Failed to load \${language}/\${namespace}:\`, err);
+          console.warn(\`Failed to load \${language}/\${namespace}:\`, err);
           callback(null, {});
         }
       }
@@ -76,11 +75,11 @@ export function generateClientScript(
             namespace = options.ns;
           }
 
-          if (namespace) {
+          if (import.meta.env.DEV && namespace) {
             const currentLanguage = i18next.language;
             if (!i18next.hasResourceBundle(currentLanguage, namespace)) {
               console.warn(
-                \`[${INTEGRATION_NAME}] Warning: Translation key "\${String(key)}" is being accessed \` +
+                \`Warning: Translation key "\${String(key)}" is being accessed \` +
                 \`for namespace "\${namespace}" in locale "\${currentLanguage}", \` +
                 \`but this namespace is not currently loaded. Ensure '\${namespace}' is loaded \` +
                 \`using 'loadNamespacesForRoute' or 'useLoadNamespaces'.\`
@@ -91,6 +90,6 @@ export function generateClientScript(
           return originalT.apply(this, args);
         };
       })
-      .catch(err => console.error('[${INTEGRATION_NAME}] Client initialization failed:', err));
+      .catch(err => console.error('Client initialization failed:', err));
   `;
 }

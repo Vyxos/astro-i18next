@@ -39,7 +39,9 @@ export function logError(error: string, label = INTEGRATION_NAME): void {
 
   const errorPrefix = bold(red(`[ERROR]`));
 
-  const output = `${gray(timestamp)} ${magenta(prefix)} ${errorPrefix} ${red(error)}`;
+  const output = `${gray(timestamp)} ${magenta(prefix)} ${errorPrefix} ${red(
+    error
+  )}`;
 
   console.error(output);
 }
