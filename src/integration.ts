@@ -3,7 +3,7 @@ import { createI18nextConfig, mergeOptionsWithDefaults } from "./config";
 import { INTEGRATION_NAME } from "./constants";
 import { generateClientScript } from "./scripts/client";
 import { generateServerScript } from "./scripts/server";
-import { loadAllTranslations } from "./translation-loader";
+import { getAllFilePaths, loadAllTranslations } from "./translation-loader";
 import type { IntegrationOptions } from "./types/integration";
 import { generateTypescriptDefinitions } from "./utils/type-generation";
 import { validateOptions } from "./validation";
@@ -19,6 +19,7 @@ export function i18nIntegration(options: IntegrationOptions): AstroIntegration {
       "astro:config:setup": async ({
         config,
         injectScript,
+        addWatchFile,
         updateConfig,
         addMiddleware,
       }) => {
@@ -60,6 +61,13 @@ export function i18nIntegration(options: IntegrationOptions): AstroIntegration {
             entrypoint: `${INTEGRATION_NAME}/middleware`,
             order: "post",
           });
+
+          const translationsData = getAllFilePaths(
+            config.srcDir.pathname,
+            safeOptions
+          );
+
+          translationsData.forEach(({ path }) => addWatchFile(path));
         } catch (error) {
           if (error instanceof Error) {
             throw new Error(
