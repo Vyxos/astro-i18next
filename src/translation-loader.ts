@@ -1,7 +1,6 @@
 import { existsSync, readFileSync } from "fs";
 import { resolve } from "pathe";
-import { INTEGRATION_NAME } from "./constants";
-import { logError } from "./logger";
+import { logError, logWarn } from "./logger";
 import { IntegrationOptionsInternal } from "./types/integration";
 import type { TranslationContent, TranslationMap } from "./types/translations";
 
@@ -21,10 +20,7 @@ export function loadTranslation(
   );
 
   if (!existsSync(filePath)) {
-    console.warn(
-      `[${INTEGRATION_NAME}] Translation file not found: ${filePath}\n` +
-        `Expected structure: ${translationsDir}/${locale}/${namespace}.json`
-    );
+    logWarn(`Translation file not found: ${filePath}`);
     return {};
   }
 
@@ -32,7 +28,6 @@ export function loadTranslation(
     const content = readFileSync(filePath, "utf-8");
     const parsed = JSON.parse(content) as string;
 
-    // Validate that the parsed content is an object
     if (
       typeof parsed !== "object" ||
       parsed === null ||
