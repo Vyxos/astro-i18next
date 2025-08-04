@@ -1,13 +1,13 @@
 import { INTEGRATION_NAME } from "./constants";
-import { loadTranslation } from "./translation-loader";
+import { getFilePath, loadTranslation } from "./translation-loader";
 import type { IntegrationOptionsInternal } from "./types/integration";
 
 /**
  * Creates a Vite plugin for handling i18n virtual modules
  */
 export function createI18nVitePlugin(
-  options: IntegrationOptionsInternal,
-  srcDir: string
+  srcDir: string,
+  options: IntegrationOptionsInternal
 ) {
   return {
     name: "i18n-virtual-modules",
@@ -17,7 +17,6 @@ export function createI18nVitePlugin(
       const match = id.match(/^virtual:i18n-translation:(.+)\/(.+)$/);
       if (match) return id;
 
-      // Handle generated virtual modules
       const virtualMatch = id.match(/^\.?\/virtual-i18n-(.+)-(.+)\.js$/);
       if (virtualMatch)
         return `virtual:i18n-translation:${virtualMatch[1]}/${virtualMatch[2]}`;
@@ -31,10 +30,7 @@ export function createI18nVitePlugin(
       if (match) {
         const [, locale, namespace] = match;
         const translation = loadTranslation(
-          srcDir,
-          options.translationsDir,
-          locale,
-          namespace
+          getFilePath(locale, namespace, srcDir, options.translationsDir)
         );
         return `export default ${JSON.stringify(translation)};`;
       }

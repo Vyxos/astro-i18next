@@ -35,7 +35,7 @@ export function i18nIntegration(options: IntegrationOptions): AstroIntegration {
           updateConfig({
             vite: {
               plugins: [
-                createI18nVitePlugin(safeOptions, config.srcDir.pathname),
+                createI18nVitePlugin(config.srcDir.pathname, safeOptions),
               ],
             },
           });
@@ -44,6 +44,7 @@ export function i18nIntegration(options: IntegrationOptions): AstroIntegration {
             "page-ssr",
             generateServerScript(baseConfig, allTranslations, safeOptions)
           );
+
           injectScript(
             "before-hydration",
             generateClientScript(baseConfig, safeOptions)

@@ -7,3 +7,9 @@ export interface TranslationMap {
     [namespace: string]: TranslationContent;
   };
 }
+
+export interface LocaleFileData {
+  path: string;
+  locale: string;
+  namespace: string;
+}
