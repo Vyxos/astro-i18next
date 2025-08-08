@@ -43,5 +43,5 @@ export const defaultOptions: DefaultIntegrationOptions = {
     dirPath: "types",
     fileName: "i18next-resources",
   },
-  translationsDir: "",
+  translationsDir: "i18n",
 };
