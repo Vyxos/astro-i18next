@@ -14,7 +14,7 @@ export function createI18nextConfig(
   return {
     lng: options.defaultLocale,
     fallbackLng: options.defaultLocale,
-    supportedLngs: options.locales,
+    supportedLngs: options.supportedLngs,
     defaultNS: options.defaultNamespace,
     fallbackNS: options.defaultNamespace,
     ns: [options.defaultNamespace],

@@ -19,7 +19,7 @@ const ASTRO_RESERVED_ROUTES = ["/_astro", "/_actions", "/_server-islands"];
  * @since 0.2.0
  */
 export async function onRequest(context: APIContext, next: MiddlewareNext) {
-  const { locales, defaultLocale } = getLocaleConfig();
+  const { supportedLngs: lngs, defaultLocale } = getLocaleConfig();
 
   if (
     [...ASTRO_RESERVED_ROUTES].some(
@@ -32,9 +32,13 @@ export async function onRequest(context: APIContext, next: MiddlewareNext) {
   }
 
   const localeFromPathname = context.url.pathname.split("/")[1];
-  const nextLocale = [localeFromPathname, defaultLocale].find(
-    (locale) => locale && locales.includes(locale)
-  );
+
+  const nextLocale = [localeFromPathname, defaultLocale].find((locale) => {
+    const containsLocale = Array.isArray(lngs) && lngs.includes(locale);
+    const supportsAnyLanguage = lngs === false;
+
+    return locale && (containsLocale || supportsAnyLanguage);
+  });
 
   await i18n.changeLanguage(nextLocale);
 

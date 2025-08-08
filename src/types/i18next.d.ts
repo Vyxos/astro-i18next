@@ -9,7 +9,7 @@ declare module "i18next" {
     integrationOptions: Pick<
       MergedIntegrationOptions,
       | "defaultLocale"
-      | "locales"
+      | "supportedLngs"
       | "defaultNamespace"
       | "namespaces"
       | "translationsDir"

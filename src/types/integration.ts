@@ -19,7 +19,7 @@ export interface InternalKeys {
  */
 export interface i18NextKeys {
   /** Array of supported locale codes (e.g., ['en', 'fr', 'de']) */
-  locales: string[];
+  supportedLngs: InitOptions["supportedLngs"];
 
   /** Default locale to use when no specific locale is detected */
   defaultLocale: string;
@@ -59,9 +59,6 @@ export interface I18nBaseConfig extends InitOptions {
 
   /** Fallback language when translation is missing */
   fallbackLng: string;
-
-  /** Array of supported language codes */
-  supportedLngs: string[];
 
   /** Default namespace for translations */
   defaultNS: string;

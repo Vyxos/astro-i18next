@@ -1,5 +1,9 @@
 import { INTEGRATION_NAME } from "./constants";
-import { getFilePath, loadTranslation } from "./translation-loader";
+import {
+  discoverAvailableLanguages,
+  getFilePath,
+  loadTranslation,
+} from "./translation-loader";
 import type { IntegrationOptionsInternal } from "./types/integration";
 
 /**
@@ -20,10 +24,12 @@ export function createI18nVitePlugin(
       const virtualMatch = id.match(/^\.?\/virtual-i18n-(.+)-(.+)\.js$/);
       if (virtualMatch)
         return `virtual:i18n-translation:${virtualMatch[1]}/${virtualMatch[2]}`;
+
+      return null;
     },
     load(id: string) {
       if (id === "virtual:i18n-loader") {
-        return generateDynamicTranslationLoader(options);
+        return generateDynamicTranslationLoader(srcDir, options);
       }
 
       const match = id.match(/^virtual:i18n-translation:(.+)\/(.+)$/);
@@ -34,17 +40,33 @@ export function createI18nVitePlugin(
         );
         return `export default ${JSON.stringify(translation)};`;
       }
+
+      return null;
     },
   };
 }
 
 function generateDynamicTranslationLoader(
+  srcDir: string,
   options: IntegrationOptionsInternal
 ): string {
   const importMap: string[] = [];
   const caseStatements: string[] = [];
 
-  options.locales.forEach((locale) => {
+  // Handle different supportedLngs values:
+  // - false/undefined: support all found languages (would need discovery logic)
+  // - []: support no languages
+  // - array with items: support those specific languages
+  let locales: string[] = [];
+
+  if (options.supportedLngs === false || options.supportedLngs === undefined) {
+    // Automatically discover languages from translations directory
+    locales = discoverAvailableLanguages(srcDir, options.translationsDir);
+  } else if (Array.isArray(options.supportedLngs)) {
+    locales = options.supportedLngs;
+  }
+
+  locales.forEach((locale) => {
     options.namespaces.forEach((namespace) => {
       const importVar = `${locale}_${namespace}`.replace(/[^a-zA-Z0-9_]/g, "_");
       importMap.push(
@@ -81,7 +103,7 @@ export async function preloadNamespaces(locale, namespaces) {
 }
 
 // Available locales and namespaces for validation
-export const availableLocales = ${JSON.stringify(options.locales)};
+export const availableLocales = ${JSON.stringify(locales)};
 export const availableNamespaces = ${JSON.stringify(options.namespaces)};
 `;
 }

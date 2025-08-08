@@ -15,14 +15,15 @@ export function validateOptions(options: IntegrationOptions): void {
     throw new I18nConfigError("Integration options are required");
   }
 
-  if (
-    !options.locales ||
-    !Array.isArray(options.locales) ||
-    options.locales.length === 0
-  ) {
+  const isAutoDetect =
+    options.supportedLngs === false || options.supportedLngs === undefined;
+  const isExplicitArray = Array.isArray(options.supportedLngs);
+  const isValidFormat = isAutoDetect || isExplicitArray;
+
+  if (!isValidFormat) {
     throw new I18nConfigError(
-      "At least one locale must be specified",
-      "locales"
+      "supportedLngs must be an array, false, or undefined",
+      "supportedLngs"
     );
   }
 
@@ -33,9 +34,12 @@ export function validateOptions(options: IntegrationOptions): void {
     );
   }
 
-  if (!options.locales.includes(options.defaultLocale)) {
+  if (
+    Array.isArray(options.supportedLngs) &&
+    !options.supportedLngs.includes(options.defaultLocale)
+  ) {
     throw new I18nConfigError(
-      `Default locale "${options.defaultLocale}" must be included in locales array`,
+      `Default locale "${options.defaultLocale}" must be included in supportedLngs array`,
       "defaultLocale"
     );
   }
@@ -75,16 +79,18 @@ export function validateOptions(options: IntegrationOptions): void {
     );
   }
 
-  // Validate locale format (basic check)
-  const invalidLocales = options.locales.filter(
-    (locale: string) =>
-      typeof locale !== "string" || !/^[a-z]{2}(-[A-Z]{2})?$/.test(locale)
-  );
-  if (invalidLocales.length > 0) {
-    throw new I18nConfigError(
-      `Invalid locale format: ${invalidLocales.join(", ")}. Use format: "en", "en-US"`,
-      "locales"
+  // Validate locale format (basic check) - only if supportedLngs is an array
+  if (Array.isArray(options.supportedLngs)) {
+    const invalidLocales = options.supportedLngs.filter(
+      (locale: string) =>
+        typeof locale !== "string" || !/^[a-z]{2}(-[A-Z]{2})?$/.test(locale)
     );
+    if (invalidLocales.length > 0) {
+      throw new I18nConfigError(
+        `Invalid locale format: ${invalidLocales.join(", ")}. Use format: "en", "en-US"`,
+        "supportedLngs"
+      );
+    }
   }
 
   // Validate namespace format (no special characters that could break file paths)

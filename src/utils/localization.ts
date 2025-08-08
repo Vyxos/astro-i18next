@@ -27,13 +27,16 @@ import { getLocaleConfig } from "../utils";
  * @since 0.1.5
  */
 export function getLocalizedPathname(pathname: string, locale?: string) {
-  const { defaultLocale, locales } = getLocaleConfig();
+  const { defaultLocale, supportedLngs } = getLocaleConfig();
   const targetLocale = locale || i18next.language || "";
   const localeFromPathname = pathname.split("/")[1];
   let localizedPathname = pathname;
 
   // 1. Strip any existing locale from the pathname to get a clean, unlocalized path.
-  if (locales && locales.includes(localeFromPathname)) {
+  if (
+    Array.isArray(supportedLngs) &&
+    supportedLngs.includes(localeFromPathname)
+  ) {
     localizedPathname =
       localizedPathname.replace("/" + localeFromPathname, "") || "/";
   }
@@ -41,8 +44,8 @@ export function getLocalizedPathname(pathname: string, locale?: string) {
   // 2. Add the target locale as a prefix, but only if it's a valid,
   // non-default locale.
   if (
-    locales &&
-    locales.includes(targetLocale) &&
+    Array.isArray(supportedLngs) &&
+    supportedLngs.includes(targetLocale) &&
     targetLocale !== defaultLocale
   ) {
     localizedPathname =
@@ -80,10 +83,13 @@ export function getLocalizedPathname(pathname: string, locale?: string) {
  * @since 0.2.0
  */
 export function changeLocale(nextLocale: string = "", shallow: boolean = true) {
-  const { locales } = getLocaleConfig();
+  const { supportedLngs } = getLocaleConfig();
 
-  if (!locales.includes(nextLocale)) {
-    return;
+  // Handle different supportedLngs values
+  if (Array.isArray(supportedLngs)) {
+    if (!supportedLngs.includes(nextLocale)) {
+      return;
+    }
   }
 
   i18next.changeLanguage(nextLocale);
