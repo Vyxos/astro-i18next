@@ -1,37 +1,20 @@
 import type {
   DefaultIntegrationOptions,
-  I18nBaseConfig,
   IntegrationOptions,
-  IntegrationOptionsInternal,
 } from "./types/integration";
+import type { InitOptions } from "i18next";
 
 /**
  * Creates the base i18next configuration
  */
 export function createI18nextConfig(
-  options: IntegrationOptionsInternal,
-  i18NextOptions?: IntegrationOptions["i18NextOptions"]
-): Partial<I18nBaseConfig> {
-  const baseConfig: Partial<I18nBaseConfig> = {
-    lng: options.lng,
-    fallbackLng: options.fallbackLng,
-    supportedLngs: options.supportedLngs,
-    defaultNS: options.defaultNS,
-    fallbackNS: options.fallbackNS,
-    ns: options.ns,
-  };
-
-  return {
-    ...i18NextOptions,
-    ...baseConfig,
-  };
+  i18NextOptions: IntegrationOptions["i18NextOptions"]
+): Partial<InitOptions> {
+  return i18NextOptions;
 }
 
-export function mergeOptionsWithDefaults(
-  options: IntegrationOptions
-): IntegrationOptionsInternal {
+export function applyInternalDefaults(options: IntegrationOptions) {
   return {
-    ...options,
     translationsDir: options.translationsDir ?? defaultOptions.translationsDir,
     generatedTypes: {
       dirPath:

@@ -1,17 +1,19 @@
 import { INTEGRATION_NAME } from "../constants";
 import type {
-  I18nBaseConfig,
   IntegrationOptionsInternal,
+  IntegrationOptions,
 } from "../types/integration";
 import type { TranslationMap } from "../types/translations";
+import type { InitOptions } from "i18next";
 
 /**
  * Generates the server-side initialization script
  */
 export function generateServerScript(
-  baseConfig: Partial<I18nBaseConfig>,
+  baseConfig: Partial<InitOptions>,
   allTranslations: TranslationMap,
-  options: IntegrationOptionsInternal
+  internalOptions: IntegrationOptionsInternal,
+  i18nextOptions: IntegrationOptions["i18NextOptions"]
 ): string {
   return `
     import i18next from "i18next";
@@ -22,7 +24,7 @@ export function generateServerScript(
       ...${JSON.stringify(baseConfig)},
       resources,
       initImmediate: true,
-      integrationOptions: ${JSON.stringify(options)}
+      integrationOptions: ${JSON.stringify({ ...internalOptions, ...i18nextOptions })}
     }).catch(err => console.error('[${INTEGRATION_NAME}] Server initialization failed:', err));
   `;
 }

@@ -1,6 +1,6 @@
 import type { APIContext, MiddlewareNext } from "astro";
 import i18n from "i18next";
-import { getLocaleConfig } from "./utils";
+import { getConfig } from "./utils";
 
 const ASTRO_RESERVED_ROUTES = ["/_astro", "/_actions", "/_server-islands"];
 
@@ -19,7 +19,7 @@ const ASTRO_RESERVED_ROUTES = ["/_astro", "/_actions", "/_server-islands"];
  * @since 0.2.0
  */
 export async function onRequest(context: APIContext, next: MiddlewareNext) {
-  const { supportedLngs: lngs, lng } = getLocaleConfig();
+  const { supportedLngs: lngs, lng } = getConfig();
 
   if (
     [...ASTRO_RESERVED_ROUTES].some(
@@ -39,12 +39,17 @@ export async function onRequest(context: APIContext, next: MiddlewareNext) {
     potentialLocales.push(lng);
   }
 
+  // If lng is 'cimode', bypass normal locale detection and use cimode directly
+  if (lng === "cimode") {
+    await i18n.changeLanguage("cimode");
+    return next();
+  }
+
   const nextLocale = potentialLocales.find((locale) => {
     const containsLocale = Array.isArray(lngs) && lngs.includes(locale);
     const supportsAnyLanguage = lngs === false;
-    const isCimode = lng === "cimode" && locale === lng;
 
-    return locale && (containsLocale || supportsAnyLanguage || isCimode);
+    return locale && (containsLocale || supportsAnyLanguage);
   });
 
   if (nextLocale) {

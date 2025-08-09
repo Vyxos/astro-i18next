@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 import i18next from "i18next";
 import { logError } from "../logger";
-import { getLocaleConfig } from "../utils";
+import { getConfig } from "../utils";
 
 /**
  * Generates a localized URL pathname based on a given path and target locale.
@@ -27,7 +27,7 @@ import { getLocaleConfig } from "../utils";
  * @since 0.1.5
  */
 export function getLocalizedPathname(pathname: string, locale?: string) {
-  const { lng, supportedLngs } = getLocaleConfig();
+  const { lng, supportedLngs } = getConfig();
   const targetLocale = locale || i18next.language || "";
   const localeFromPathname = pathname.split("/")[1];
   let localizedPathname = pathname;

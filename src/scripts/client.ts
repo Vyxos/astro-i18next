@@ -1,14 +1,16 @@
 import {
-  I18nBaseConfig,
   IntegrationOptionsInternal,
+  IntegrationOptions,
 } from "../types/integration";
+import type { InitOptions } from "i18next";
 
 /**
  * Generates the client-side initialization script with on-demand loading
  */
 export function generateClientScript(
-  baseConfig: Partial<I18nBaseConfig>,
-  options: IntegrationOptionsInternal
+  baseConfig: Partial<InitOptions>,
+  internalOptions: IntegrationOptionsInternal,
+  i18nextOptions: IntegrationOptions["i18NextOptions"]
 ): string {
   return `
     import i18next from "i18next";
@@ -57,7 +59,7 @@ export function generateClientScript(
         },
         load: 'currentOnly',
         partialBundledLanguages: true,
-        integrationOptions: ${JSON.stringify(options)}
+        integrationOptions: ${JSON.stringify({ ...internalOptions, ...i18nextOptions })}
       }).then(() => {
         const originalT = i18next.t;
 

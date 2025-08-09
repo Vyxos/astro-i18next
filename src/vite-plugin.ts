@@ -4,14 +4,18 @@ import {
   getFilePath,
   loadTranslation,
 } from "./translation-loader";
-import type { IntegrationOptionsInternal } from "./types/integration";
+import type {
+  IntegrationOptionsInternal,
+  IntegrationOptions,
+} from "./types/integration";
 
 /**
  * Creates a Vite plugin for handling i18n virtual modules
  */
 export function createI18nVitePlugin(
   srcDir: string,
-  options: IntegrationOptionsInternal
+  internalOptions: IntegrationOptionsInternal,
+  i18nextOptions: IntegrationOptions["i18NextOptions"]
 ) {
   return {
     name: "i18n-virtual-modules",
@@ -29,14 +33,23 @@ export function createI18nVitePlugin(
     },
     load(id: string) {
       if (id === "virtual:i18n-loader") {
-        return generateDynamicTranslationLoader(srcDir, options);
+        return generateDynamicTranslationLoader(
+          srcDir,
+          internalOptions,
+          i18nextOptions
+        );
       }
 
       const match = id.match(/^virtual:i18n-translation:(.+)\/(.+)$/);
       if (match) {
         const [, locale, namespace] = match;
         const translation = loadTranslation(
-          getFilePath(locale, namespace, srcDir, options.translationsDir)
+          getFilePath(
+            locale,
+            namespace,
+            srcDir,
+            internalOptions.translationsDir
+          )
         );
         return `export default ${JSON.stringify(translation)};`;
       }
@@ -48,7 +61,8 @@ export function createI18nVitePlugin(
 
 function generateDynamicTranslationLoader(
   srcDir: string,
-  options: IntegrationOptionsInternal
+  internalOptions: IntegrationOptionsInternal,
+  i18nextOptions: IntegrationOptions["i18NextOptions"]
 ): string {
   const importMap: string[] = [];
   const caseStatements: string[] = [];
@@ -59,21 +73,27 @@ function generateDynamicTranslationLoader(
   // - array with items: support those specific languages
   let locales: string[] = [];
 
-  if (options.supportedLngs === false || options.supportedLngs === undefined) {
+  if (
+    i18nextOptions.supportedLngs === false ||
+    i18nextOptions.supportedLngs === undefined
+  ) {
     // Automatically discover languages from translations directory
-    locales = discoverAvailableLanguages(srcDir, options.translationsDir);
-  } else if (Array.isArray(options.supportedLngs)) {
-    locales = options.supportedLngs;
+    locales = discoverAvailableLanguages(
+      srcDir,
+      internalOptions.translationsDir
+    );
+  } else if (Array.isArray(i18nextOptions.supportedLngs)) {
+    locales = i18nextOptions.supportedLngs;
   }
 
   // Convert ns to array format for iteration
   let namespaces: string[] = [];
-  if (options.ns === undefined) {
+  if (i18nextOptions.ns === undefined) {
     namespaces = ["translation"]; // i18next default
-  } else if (typeof options.ns === "string") {
-    namespaces = [options.ns];
-  } else if (Array.isArray(options.ns)) {
-    namespaces = options.ns;
+  } else if (typeof i18nextOptions.ns === "string") {
+    namespaces = [i18nextOptions.ns];
+  } else if (Array.isArray(i18nextOptions.ns)) {
+    namespaces = i18nextOptions.ns;
   }
 
   locales.forEach((locale) => {

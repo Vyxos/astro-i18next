@@ -14,11 +14,4 @@ export function validateOptions(options: IntegrationOptions): void {
   if (!options) {
     throw new I18nConfigError("Integration options are required");
   }
-
-  if (!options.translationsDir || typeof options.translationsDir !== "string") {
-    throw new I18nConfigError(
-      "Translations directory is required and must be a string",
-      "translationsDir"
-    );
-  }
 }

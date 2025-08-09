@@ -3,7 +3,10 @@ import { mergeResourcesAsInterface } from "i18next-resources-for-ts";
 import { join } from "node:path";
 import { relative, resolve } from "pathe";
 import { log } from "../logger";
-import { IntegrationOptionsInternal } from "../types/integration";
+import {
+  IntegrationOptionsInternal,
+  IntegrationOptions,
+} from "../types/integration";
 import { TranslationMap } from "../types/translations";
 
 function toNamespaceArray(translationMap: TranslationMap, lng?: string) {
@@ -23,16 +26,17 @@ function toNamespaceArray(translationMap: TranslationMap, lng?: string) {
 export function generateTypescriptDefinitions(
   namespaces: TranslationMap,
   outputDirPath: string,
-  options: IntegrationOptionsInternal
+  internalOptions: IntegrationOptionsInternal,
+  i18nextOptions: IntegrationOptions["i18NextOptions"]
 ) {
   try {
     const INTERFACE_OUTPUT_FILE = join(
-      resolve(outputDirPath, options.generatedTypes.dirPath),
-      `${options.generatedTypes.fileName}.d.ts`
+      resolve(outputDirPath, internalOptions.generatedTypes.dirPath),
+      `${internalOptions.generatedTypes.fileName}.d.ts`
     );
 
     const typeDefinitionFile = mergeResourcesAsInterface(
-      toNamespaceArray(namespaces, options.lng)
+      toNamespaceArray(namespaces, i18nextOptions.lng)
     );
 
     const final = `
@@ -40,7 +44,7 @@ import "i18next";
 
 declare module "i18next" {
   interface CustomTypeOptions {
-    defaultNS: "${options.defaultNS === false ? "false" : options.defaultNS || "translation"}";
+    defaultNS: "${i18nextOptions.defaultNS === false ? "false" : i18nextOptions.defaultNS || "translation"}";
     resources: Resources;
   }
 }

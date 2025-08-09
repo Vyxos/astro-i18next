@@ -14,68 +14,22 @@ export interface InternalKeys {
 }
 
 /**
- * Configuration keys that are transformed and passed to i18next.
- * These define the core internationalization behavior and are used in client.ts/server.ts scripts.
+ * Complete internal configuration with defaults applied.
+ * This represents the fully resolved internal configuration state.
  */
-export interface i18NextKeys {
-  /** Array of supported locale codes (e.g., ['en', 'fr', 'de']) */
-  supportedLngs: InitOptions["supportedLngs"];
-
-  /** Language to use (overrides language detection). If set to 'cimode' the output text will be the key */
-  lng?: InitOptions["lng"];
-
-  /** Fallback language when translation is missing. Can be string, string[], or false to disable fallback */
-  fallbackLng?: InitOptions["fallbackLng"];
-
-  /** Default namespace used if not passed to translation function. Can be string, false, or array of strings */
-  defaultNS?: InitOptions["defaultNS"];
-
-  /** String or array of namespaces to load. Defaults to 'translation' */
-  ns?: InitOptions["ns"];
-
-  /** String or array of namespaces to lookup key if not found in given namespace */
-  fallbackNS?: InitOptions["fallbackNS"];
-}
-
-/**
- * Complete internal configuration combining both i18next and internal keys.
- * This represents the fully resolved configuration state used internally.
- */
-export interface IntegrationOptionsInternal extends i18NextKeys, InternalKeys {}
+export type IntegrationOptionsInternal = Required<InternalKeys>;
 
 /**
  * User-facing integration options as defined in astro.config.mjs.
- * Requires all i18next keys while making internal keys optional with defaults.
+ * Only requires translationsDir and generatedTypes, with all i18next options in i18NextOptions.
  */
-export type IntegrationOptions = i18NextKeys &
-  Partial<InternalKeys> & {
-    /** Additional i18next configuration options */
-    i18NextOptions?: InitOptions;
-  };
+export type IntegrationOptions = Partial<InternalKeys> & {
+  /** i18next configuration options */
+  i18NextOptions: InitOptions;
+};
 
 /**
  * Default values configuration for internal keys only.
- * i18NextKeys are always required from the user configuration.
+ * i18next options are always required from the user configuration.
  */
 export type DefaultIntegrationOptions = Required<InternalKeys>;
-
-/**
- * Configuration object passed directly to i18next initialization.
- * Extends InitOptions with required properties for the integration to function.
- */
-export interface I18nBaseConfig extends InitOptions {
-  /** Current language code */
-  lng: InitOptions["lng"];
-
-  /** Fallback language when translation is missing */
-  fallbackLng: InitOptions["fallbackLng"];
-
-  /** Default namespace used if not passed to translation function */
-  defaultNS: InitOptions["defaultNS"];
-
-  /** String or array of namespaces to lookup key if not found in given namespace */
-  fallbackNS: InitOptions["fallbackNS"];
-
-  /** String or array of namespaces to load */
-  ns: InitOptions["ns"];
-}

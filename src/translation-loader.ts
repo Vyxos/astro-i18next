@@ -1,7 +1,10 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "fs";
 import { resolve } from "pathe";
 import { logError, logWarn } from "./logger";
-import { IntegrationOptionsInternal } from "./types/integration";
+import {
+  IntegrationOptionsInternal,
+  IntegrationOptions,
+} from "./types/integration";
 import type {
   LocaleFileData,
   TranslationContent,
@@ -47,10 +50,15 @@ export function loadTranslation(filePath: string): TranslationContent {
  */
 export function loadAllTranslations(
   srcDir: string,
-  options: IntegrationOptionsInternal
+  internalOptions: IntegrationOptionsInternal,
+  i18nextOptions: IntegrationOptions["i18NextOptions"]
 ): TranslationMap {
   const allTranslations: TranslationMap = {};
-  const localeFilesData = getAllFilePaths(srcDir, options);
+  const localeFilesData = getAllFilePaths(
+    srcDir,
+    internalOptions,
+    i18nextOptions
+  );
 
   for (const data of localeFilesData) {
     if (allTranslations[data.locale] === undefined) {
@@ -65,12 +73,16 @@ export function loadAllTranslations(
 
 export function getAllFilePaths(
   srcDir: string,
-  options: IntegrationOptionsInternal
+  internalOptions: IntegrationOptionsInternal,
+  i18nextOptions: IntegrationOptions["i18NextOptions"]
 ) {
   const filePaths: LocaleFileData[] = [];
 
-  if (options.supportedLngs === false || options.supportedLngs === undefined) {
-    const translationDirPath = resolve(srcDir, options.translationsDir);
+  if (
+    i18nextOptions.supportedLngs === false ||
+    i18nextOptions.supportedLngs === undefined
+  ) {
+    const translationDirPath = resolve(srcDir, internalOptions.translationsDir);
 
     if (!existsSync(translationDirPath)) {
       return filePaths;
@@ -105,24 +117,24 @@ export function getAllFilePaths(
   }
 
   // Handle array supportedLngs (including empty arrays)
-  if (Array.isArray(options.supportedLngs)) {
+  if (Array.isArray(i18nextOptions.supportedLngs)) {
     // Convert ns to array format for iteration
     let namespaces: string[] = [];
-    if (options.ns === undefined) {
+    if (i18nextOptions.ns === undefined) {
       namespaces = ["translation"]; // i18next default
-    } else if (typeof options.ns === "string") {
-      namespaces = [options.ns];
-    } else if (Array.isArray(options.ns)) {
-      namespaces = options.ns;
+    } else if (typeof i18nextOptions.ns === "string") {
+      namespaces = [i18nextOptions.ns];
+    } else if (Array.isArray(i18nextOptions.ns)) {
+      namespaces = i18nextOptions.ns;
     }
 
-    for (const locale of options.supportedLngs) {
+    for (const locale of i18nextOptions.supportedLngs) {
       for (const namespace of namespaces) {
         const filePath = getFilePath(
           locale,
           namespace,
           srcDir,
-          options.translationsDir
+          internalOptions.translationsDir
         );
 
         filePaths.push({ path: filePath, locale, namespace });
