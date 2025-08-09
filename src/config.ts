@@ -9,15 +9,21 @@ import type {
  * Creates the base i18next configuration
  */
 export function createI18nextConfig(
-  options: IntegrationOptionsInternal
+  options: IntegrationOptionsInternal,
+  i18NextOptions?: IntegrationOptions["i18NextOptions"]
 ): Partial<I18nBaseConfig> {
-  return {
+  const baseConfig = {
     lng: options.defaultLocale,
     fallbackLng: options.defaultLocale,
     supportedLngs: options.supportedLngs,
     defaultNS: options.defaultNamespace,
     fallbackNS: options.defaultNamespace,
     ns: [options.defaultNamespace],
+  };
+
+  return {
+    ...i18NextOptions,
+    ...baseConfig,
   };
 }
 

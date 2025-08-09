@@ -27,7 +27,10 @@ export function i18nIntegration(options: IntegrationOptions): AstroIntegration {
           validateOptions(options);
           const safeOptions = mergeOptionsWithDefaults(options);
 
-          const baseConfig = createI18nextConfig(safeOptions);
+          const baseConfig = createI18nextConfig(
+            safeOptions,
+            options.i18NextOptions
+          );
           const allTranslations = loadAllTranslations(
             config.srcDir.pathname,
             safeOptions

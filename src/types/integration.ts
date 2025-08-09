@@ -41,7 +41,11 @@ export interface IntegrationOptionsInternal extends i18NextKeys, InternalKeys {}
  * User-facing integration options as defined in astro.config.mjs.
  * Requires all i18next keys while making internal keys optional with defaults.
  */
-export type IntegrationOptions = Required<i18NextKeys> & Partial<InternalKeys>;
+export type IntegrationOptions = Required<i18NextKeys> &
+  Partial<InternalKeys> & {
+    /** Additional i18next configuration options */
+    i18NextOptions?: InitOptions;
+  };
 
 /**
  * Default values configuration for internal keys only.
