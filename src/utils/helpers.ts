@@ -10,9 +10,9 @@ import { IntegrationOptionsInternal } from "../types/integration";
  * the build process and stored globally for runtime access.
  *
  * @returns {LocaleConfig} The locale configuration object containing:
- *   - `locales`: Array of all supported locale codes (e.g., ['en', 'fr', 'es'])
- *   - `defaultLocale`: The default locale code (e.g., 'en')
- *   - `prefixDefaultLocale`: Whether to include the default locale in URLs
+ *   - `supportedLngs`: Array of all supported locale codes (e.g., ['en', 'fr', 'es'])
+ *   - `lng`: The language to use (e.g., 'en' or 'cimode' for debugging)
+ *   - Other configuration options
  *
  * @throws {Error} Throws an error if the configuration is not available, which typically
  *   indicates that the astro-i18next integration is not properly configured.

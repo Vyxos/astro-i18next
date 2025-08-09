@@ -30,7 +30,7 @@ export function generateClientScript(
     };
     
     window.__i18nLoadNamespaces = async function(namespaces) {
-      const currentLang = i18next.language || '${baseConfig.lng}';
+      const currentLang = i18next.language${baseConfig.lng ? ` || '${baseConfig.lng}'` : ""};
       const promises = namespaces.map(ns => 
         new Promise((resolve) => {
           if (i18next.hasResourceBundle(currentLang, ns)) {

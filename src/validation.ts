@@ -27,20 +27,10 @@ export function validateOptions(options: IntegrationOptions): void {
     );
   }
 
-  if (!options.defaultLocale || typeof options.defaultLocale !== "string") {
+  if (options.lng !== undefined && typeof options.lng !== "string") {
     throw new I18nConfigError(
-      "Default locale is required and must be a string",
-      "defaultLocale"
-    );
-  }
-
-  if (
-    Array.isArray(options.supportedLngs) &&
-    !options.supportedLngs.includes(options.defaultLocale)
-  ) {
-    throw new I18nConfigError(
-      `Default locale "${options.defaultLocale}" must be included in supportedLngs array`,
-      "defaultLocale"
+      "Language (lng) must be a string if provided",
+      "lng"
     );
   }
 
@@ -76,31 +66,6 @@ export function validateOptions(options: IntegrationOptions): void {
     throw new I18nConfigError(
       "Translations directory is required and must be a string",
       "translationsDir"
-    );
-  }
-
-  // Validate locale format (basic check) - only if supportedLngs is an array
-  if (Array.isArray(options.supportedLngs)) {
-    const invalidLocales = options.supportedLngs.filter(
-      (locale: string) =>
-        typeof locale !== "string" || !/^[a-z]{2}(-[A-Z]{2})?$/.test(locale)
-    );
-    if (invalidLocales.length > 0) {
-      throw new I18nConfigError(
-        `Invalid locale format: ${invalidLocales.join(", ")}. Use format: "en", "en-US"`,
-        "supportedLngs"
-      );
-    }
-  }
-
-  // Validate namespace format (no special characters that could break file paths)
-  const invalidNamespaces = options.namespaces.filter(
-    (ns: string) => typeof ns !== "string" || !/^[a-zA-Z0-9_-]+$/.test(ns)
-  );
-  if (invalidNamespaces.length > 0) {
-    throw new I18nConfigError(
-      `Invalid namespace format: ${invalidNamespaces.join(", ")}. Use only letters, numbers, hyphens, and underscores`,
-      "namespaces"
     );
   }
 }

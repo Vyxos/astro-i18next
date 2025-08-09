@@ -12,9 +12,9 @@ export function createI18nextConfig(
   options: IntegrationOptionsInternal,
   i18NextOptions?: IntegrationOptions["i18NextOptions"]
 ): Partial<I18nBaseConfig> {
-  const baseConfig = {
-    lng: options.defaultLocale,
-    fallbackLng: options.defaultLocale,
+  const baseConfig: Partial<I18nBaseConfig> = {
+    lng: options.lng,
+    fallbackLng: options.fallbackLng,
     supportedLngs: options.supportedLngs,
     defaultNS: options.defaultNamespace,
     fallbackNS: options.defaultNamespace,

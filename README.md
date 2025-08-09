@@ -30,8 +30,8 @@ import { i18nIntegration } from "@vyxos/astro-i18next";
 export default defineConfig({
   integrations: [
     i18nIntegration({
-      locales: ["en", "sk", "cs"],
-      defaultLocale: "en",
+      supportedLngs: ["en", "sk", "cs"],
+      lng: "en", // Optional - will use language detection if not specified
       namespaces: ["common", "auth", "dashboard", "forms"],
       defaultNamespace: "common",
       translationsDir: "src/translations",
@@ -159,13 +159,29 @@ function DynamicComponent() {
 
 ```typescript
 interface IntegrationOptions {
-  locales: string[]; // Available languages
-  defaultLocale: string; // Fallback language
+  supportedLngs: string[] | false; // Available languages (false for auto-detection)
+  lng?: string; // Initial language (optional - use 'cimode' for debugging)
+  fallbackLng?: string | string[] | false; // Fallback language(s)
   namespaces: string[]; // Available namespaces
   defaultNamespace: string; // Default namespace
   translationsDir: string; // Path to translation files
 }
 ```
+
+### Debugging with 'cimode'
+
+For debugging translation keys, you can set `lng: 'cimode'`:
+
+```typescript
+i18nIntegration({
+  supportedLngs: ["en", "sk", "cs"],
+  lng: "cimode", // Shows translation keys instead of values
+  namespaces: ["common", "auth"],
+  defaultNamespace: "common",
+})
+```
+
+This will display keys like `common:greeting` instead of translated text, making it easy to identify missing translations or debug key usage.
 
 ### Client Functions
 

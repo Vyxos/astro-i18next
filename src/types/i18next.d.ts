@@ -8,7 +8,8 @@ declare module "i18next" {
   interface InitOptions {
     integrationOptions: Pick<
       MergedIntegrationOptions,
-      | "defaultLocale"
+      | "lng"
+      | "fallbackLng"
       | "supportedLngs"
       | "defaultNamespace"
       | "namespaces"

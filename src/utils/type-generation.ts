@@ -6,11 +6,13 @@ import { log } from "../logger";
 import { IntegrationOptionsInternal } from "../types/integration";
 import { TranslationMap } from "../types/translations";
 
-function toNamespaceArray(
-  translationMap: TranslationMap,
-  defaultLocale: string
-) {
-  return Object.entries(translationMap[defaultLocale]).map(
+function toNamespaceArray(translationMap: TranslationMap, lng?: string) {
+  // Determine which locale to use for type generation
+  // If lng is 'cimode' or undefined, use the first available language
+  const localeForTypes =
+    !lng || lng === "cimode" ? Object.keys(translationMap)[0] : lng;
+
+  return Object.entries(translationMap[localeForTypes]).map(
     ([namespaceKey, resources]) => ({
       name: namespaceKey,
       resources,
@@ -30,7 +32,7 @@ export function generateTypescriptDefinitions(
     );
 
     const typeDefinitionFile = mergeResourcesAsInterface(
-      toNamespaceArray(namespaces, options.defaultLocale)
+      toNamespaceArray(namespaces, options.lng)
     );
 
     const final = `

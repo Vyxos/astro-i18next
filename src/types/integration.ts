@@ -21,8 +21,11 @@ export interface i18NextKeys {
   /** Array of supported locale codes (e.g., ['en', 'fr', 'de']) */
   supportedLngs: InitOptions["supportedLngs"];
 
-  /** Default locale to use when no specific locale is detected */
-  defaultLocale: string;
+  /** Language to use (overrides language detection). If set to 'cimode' the output text will be the key */
+  lng?: InitOptions["lng"];
+
+  /** Fallback language when translation is missing. Can be string, string[], or false to disable fallback */
+  fallbackLng?: InitOptions["fallbackLng"];
 
   /** Default namespace to use for translations */
   defaultNamespace: string;
@@ -41,7 +44,7 @@ export interface IntegrationOptionsInternal extends i18NextKeys, InternalKeys {}
  * User-facing integration options as defined in astro.config.mjs.
  * Requires all i18next keys while making internal keys optional with defaults.
  */
-export type IntegrationOptions = Required<i18NextKeys> &
+export type IntegrationOptions = i18NextKeys &
   Partial<InternalKeys> & {
     /** Additional i18next configuration options */
     i18NextOptions?: InitOptions;
@@ -59,17 +62,17 @@ export type DefaultIntegrationOptions = Required<InternalKeys>;
  */
 export interface I18nBaseConfig extends InitOptions {
   /** Current language code */
-  lng: string;
+  lng: InitOptions["lng"];
 
   /** Fallback language when translation is missing */
-  fallbackLng: string;
+  fallbackLng: InitOptions["fallbackLng"];
 
   /** Default namespace for translations */
-  defaultNS: string;
+  defaultNS: InitOptions["defaultNS"];
 
   /** Fallback namespace when default namespace fails */
-  fallbackNS: string;
+  fallbackNS: InitOptions["fallbackNS"];
 
   /** Array of loaded namespaces */
-  ns: string[];
+  ns: InitOptions["ns"];
 }

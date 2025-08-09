@@ -27,7 +27,7 @@ import { getLocaleConfig } from "../utils";
  * @since 0.1.5
  */
 export function getLocalizedPathname(pathname: string, locale?: string) {
-  const { defaultLocale, supportedLngs } = getLocaleConfig();
+  const { lng, supportedLngs } = getLocaleConfig();
   const targetLocale = locale || i18next.language || "";
   const localeFromPathname = pathname.split("/")[1];
   let localizedPathname = pathname;
@@ -42,11 +42,12 @@ export function getLocalizedPathname(pathname: string, locale?: string) {
   }
 
   // 2. Add the target locale as a prefix, but only if it's a valid,
-  // non-default locale.
+  // non-default locale. Skip adding prefix for 'cimode' as well.
+  // If lng is not set, always add the locale prefix for supported languages
   if (
     Array.isArray(supportedLngs) &&
     supportedLngs.includes(targetLocale) &&
-    targetLocale !== defaultLocale
+    (lng === undefined || (targetLocale !== lng && lng !== "cimode"))
   ) {
     localizedPathname =
       "/" + targetLocale + localizedPathname.replace(/^\/$/, "");
@@ -83,15 +84,6 @@ export function getLocalizedPathname(pathname: string, locale?: string) {
  * @since 0.2.0
  */
 export function changeLocale(nextLocale: string = "", shallow: boolean = true) {
-  const { supportedLngs } = getLocaleConfig();
-
-  // Handle different supportedLngs values
-  if (Array.isArray(supportedLngs)) {
-    if (!supportedLngs.includes(nextLocale)) {
-      return;
-    }
-  }
-
   i18next.changeLanguage(nextLocale);
 
   if (typeof window === "undefined") {
