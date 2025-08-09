@@ -16,9 +16,9 @@ export function createI18nextConfig(
     lng: options.lng,
     fallbackLng: options.fallbackLng,
     supportedLngs: options.supportedLngs,
-    defaultNS: options.defaultNamespace,
-    fallbackNS: options.defaultNamespace,
-    ns: [options.defaultNamespace],
+    defaultNS: options.defaultNS,
+    fallbackNS: options.fallbackNS,
+    ns: options.ns,
   };
 
   return {

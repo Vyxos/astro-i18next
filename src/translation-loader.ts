@@ -106,8 +106,18 @@ export function getAllFilePaths(
 
   // Handle array supportedLngs (including empty arrays)
   if (Array.isArray(options.supportedLngs)) {
+    // Convert ns to array format for iteration
+    let namespaces: string[] = [];
+    if (options.ns === undefined) {
+      namespaces = ["translation"]; // i18next default
+    } else if (typeof options.ns === "string") {
+      namespaces = [options.ns];
+    } else if (Array.isArray(options.ns)) {
+      namespaces = options.ns;
+    }
+
     for (const locale of options.supportedLngs) {
-      for (const namespace of options.namespaces) {
+      for (const namespace of namespaces) {
         const filePath = getFilePath(
           locale,
           namespace,

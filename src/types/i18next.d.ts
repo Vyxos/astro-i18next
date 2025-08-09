@@ -11,8 +11,8 @@ declare module "i18next" {
       | "lng"
       | "fallbackLng"
       | "supportedLngs"
-      | "defaultNamespace"
-      | "namespaces"
+      | "defaultNS"
+      | "ns"
       | "translationsDir"
       | "generatedTypes"
     >;

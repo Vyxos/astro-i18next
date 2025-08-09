@@ -40,7 +40,7 @@ import "i18next";
 
 declare module "i18next" {
   interface CustomTypeOptions {
-    defaultNS: "${options.defaultNamespace}";
+    defaultNS: "${options.defaultNS === false ? "false" : options.defaultNS || "translation"}";
     resources: Resources;
   }
 }

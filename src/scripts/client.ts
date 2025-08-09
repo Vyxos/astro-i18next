@@ -57,8 +57,6 @@ export function generateClientScript(
         },
         load: 'currentOnly',
         partialBundledLanguages: true,
-        ns: [], 
-        defaultNS: false,
         integrationOptions: ${JSON.stringify(options)}
       }).then(() => {
         const originalT = i18next.t;

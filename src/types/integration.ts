@@ -27,11 +27,14 @@ export interface i18NextKeys {
   /** Fallback language when translation is missing. Can be string, string[], or false to disable fallback */
   fallbackLng?: InitOptions["fallbackLng"];
 
-  /** Default namespace to use for translations */
-  defaultNamespace: string;
+  /** Default namespace used if not passed to translation function. Can be string, false, or array of strings */
+  defaultNS?: InitOptions["defaultNS"];
 
-  /** Array of all available translation namespaces */
-  namespaces: string[];
+  /** String or array of namespaces to load. Defaults to 'translation' */
+  ns?: InitOptions["ns"];
+
+  /** String or array of namespaces to lookup key if not found in given namespace */
+  fallbackNS?: InitOptions["fallbackNS"];
 }
 
 /**
@@ -67,12 +70,12 @@ export interface I18nBaseConfig extends InitOptions {
   /** Fallback language when translation is missing */
   fallbackLng: InitOptions["fallbackLng"];
 
-  /** Default namespace for translations */
+  /** Default namespace used if not passed to translation function */
   defaultNS: InitOptions["defaultNS"];
 
-  /** Fallback namespace when default namespace fails */
+  /** String or array of namespaces to lookup key if not found in given namespace */
   fallbackNS: InitOptions["fallbackNS"];
 
-  /** Array of loaded namespaces */
+  /** String or array of namespaces to load */
   ns: InitOptions["ns"];
 }

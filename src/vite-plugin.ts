@@ -66,8 +66,18 @@ function generateDynamicTranslationLoader(
     locales = options.supportedLngs;
   }
 
+  // Convert ns to array format for iteration
+  let namespaces: string[] = [];
+  if (options.ns === undefined) {
+    namespaces = ["translation"]; // i18next default
+  } else if (typeof options.ns === "string") {
+    namespaces = [options.ns];
+  } else if (Array.isArray(options.ns)) {
+    namespaces = options.ns;
+  }
+
   locales.forEach((locale) => {
-    options.namespaces.forEach((namespace) => {
+    namespaces.forEach((namespace) => {
       const importVar = `${locale}_${namespace}`.replace(/[^a-zA-Z0-9_]/g, "_");
       importMap.push(
         `const ${importVar} = () => import('./virtual-i18n-${locale}-${namespace}.js');`
@@ -104,6 +114,6 @@ export async function preloadNamespaces(locale, namespaces) {
 
 // Available locales and namespaces for validation
 export const availableLocales = ${JSON.stringify(locales)};
-export const availableNamespaces = ${JSON.stringify(options.namespaces)};
+export const availableNamespaces = ${JSON.stringify(namespaces)};
 `;
 }
