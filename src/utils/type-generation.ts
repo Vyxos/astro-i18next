@@ -4,8 +4,8 @@ import { join } from "node:path";
 import { relative, resolve } from "pathe";
 import { log } from "../logger";
 import {
-  IntegrationOptionsInternal,
   IntegrationOptions,
+  IntegrationOptionsInternal,
 } from "../types/integration";
 import { TranslationMap } from "../types/translations";
 
