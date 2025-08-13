@@ -1,19 +1,8 @@
-import { IntegrationOptions } from "../types";
-
-type MergedIntegrationOptions = {
-  [key in keyof IntegrationOptions]-?: IntegrationOptions[key];
-};
+import { IntegrationOptionsInternal, IntegrationOptions } from "../types";
 
 declare module "i18next" {
   interface InitOptions {
-    integrationOptions: Pick<
-      MergedIntegrationOptions,
-      | "defaultLocale"
-      | "locales"
-      | "defaultNamespace"
-      | "namespaces"
-      | "translationsDir"
-      | "generatedTypes"
-    >;
+    integrationOptions: IntegrationOptionsInternal &
+      IntegrationOptions["i18NextOptions"];
   }
 }

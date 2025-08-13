@@ -1,5 +1,5 @@
 import type { AstroIntegration } from "astro";
-import { createI18nextConfig, mergeOptionsWithDefaults } from "./config";
+import { applyInternalDefaults } from "./config";
 import { INTEGRATION_NAME } from "./constants";
 import { generateClientScript } from "./scripts/client";
 import { generateServerScript } from "./scripts/server";
@@ -25,36 +25,50 @@ export function i18nIntegration(options: IntegrationOptions): AstroIntegration {
       }) => {
         try {
           validateOptions(options);
-          const safeOptions = mergeOptionsWithDefaults(options);
+          const internalOptions = applyInternalDefaults(options);
 
-          const baseConfig = createI18nextConfig(safeOptions);
           const allTranslations = loadAllTranslations(
             config.srcDir.pathname,
-            safeOptions
+            internalOptions,
+            options.i18NextOptions
           );
 
           updateConfig({
             vite: {
               plugins: [
-                createI18nVitePlugin(config.srcDir.pathname, safeOptions),
+                createI18nVitePlugin(
+                  config.srcDir.pathname,
+                  internalOptions,
+                  options.i18NextOptions
+                ),
               ],
             },
           });
 
           injectScript(
             "page-ssr",
-            generateServerScript(baseConfig, allTranslations, safeOptions)
+            generateServerScript(
+              options.i18NextOptions,
+              allTranslations,
+              internalOptions,
+              options.i18NextOptions
+            )
           );
 
           injectScript(
             "before-hydration",
-            generateClientScript(baseConfig, safeOptions)
+            generateClientScript(
+              options.i18NextOptions,
+              internalOptions,
+              options.i18NextOptions
+            )
           );
 
           generateTypescriptDefinitions(
             allTranslations,
             config.srcDir.pathname,
-            safeOptions
+            internalOptions,
+            options.i18NextOptions
           );
 
           addMiddleware({
@@ -64,7 +78,8 @@ export function i18nIntegration(options: IntegrationOptions): AstroIntegration {
 
           const translationsData = getAllFilePaths(
             config.srcDir.pathname,
-            safeOptions
+            internalOptions,
+            options.i18NextOptions
           );
 
           translationsData.forEach(({ path }) => addWatchFile(path));

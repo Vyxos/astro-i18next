@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 import i18next from "i18next";
 import { logError } from "../logger";
-import { getLocaleConfig } from "../utils";
+import { getConfig } from "../utils";
 
 /**
  * Generates a localized URL pathname based on a given path and target locale.
@@ -27,23 +27,27 @@ import { getLocaleConfig } from "../utils";
  * @since 0.1.5
  */
 export function getLocalizedPathname(pathname: string, locale?: string) {
-  const { defaultLocale, locales } = getLocaleConfig();
+  const { lng, supportedLngs } = getConfig();
   const targetLocale = locale || i18next.language || "";
   const localeFromPathname = pathname.split("/")[1];
   let localizedPathname = pathname;
 
   // 1. Strip any existing locale from the pathname to get a clean, unlocalized path.
-  if (locales && locales.includes(localeFromPathname)) {
+  if (
+    Array.isArray(supportedLngs) &&
+    supportedLngs.includes(localeFromPathname)
+  ) {
     localizedPathname =
       localizedPathname.replace("/" + localeFromPathname, "") || "/";
   }
 
   // 2. Add the target locale as a prefix, but only if it's a valid,
-  // non-default locale.
+  // non-default locale. Skip adding prefix for 'cimode' as well.
+  // If lng is not set, always add the locale prefix for supported languages
   if (
-    locales &&
-    locales.includes(targetLocale) &&
-    targetLocale !== defaultLocale
+    Array.isArray(supportedLngs) &&
+    supportedLngs.includes(targetLocale) &&
+    (lng === undefined || (targetLocale !== lng && lng !== "cimode"))
   ) {
     localizedPathname =
       "/" + targetLocale + localizedPathname.replace(/^\/$/, "");
@@ -80,12 +84,6 @@ export function getLocalizedPathname(pathname: string, locale?: string) {
  * @since 0.2.0
  */
 export function changeLocale(nextLocale: string = "", shallow: boolean = true) {
-  const { locales } = getLocaleConfig();
-
-  if (!locales.includes(nextLocale)) {
-    return;
-  }
-
   i18next.changeLanguage(nextLocale);
 
   if (typeof window === "undefined") {

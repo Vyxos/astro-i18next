@@ -30,11 +30,13 @@ import { i18nIntegration } from "@vyxos/astro-i18next";
 export default defineConfig({
   integrations: [
     i18nIntegration({
-      locales: ["en", "sk", "cs"],
-      defaultLocale: "en",
-      namespaces: ["common", "auth", "dashboard", "forms"],
-      defaultNamespace: "common",
       translationsDir: "src/translations",
+      i18NextOptions: {
+        supportedLngs: ["en", "sk", "cs"],
+        lng: "en", // Optional - will use language detection if not specified
+        ns: ["common", "auth", "dashboard", "forms"],
+        defaultNS: "common",
+      },
     }),
   ],
 });
@@ -159,13 +161,38 @@ function DynamicComponent() {
 
 ```typescript
 interface IntegrationOptions {
-  locales: string[]; // Available languages
-  defaultLocale: string; // Fallback language
-  namespaces: string[]; // Available namespaces
-  defaultNamespace: string; // Default namespace
-  translationsDir: string; // Path to translation files
+  translationsDir?: string; // Path to translation files (optional, defaults to "i18n")
+  generatedTypes?: {
+    dirPath?: string; // Directory for generated types (defaults to "types")
+    fileName?: string; // Generated types filename (defaults to "i18next-resources")
+  };
+  i18NextOptions: {
+    supportedLngs: string[] | false; // Available languages (false for auto-detection)
+    lng?: string; // Initial language (optional - use 'cimode' for debugging)
+    fallbackLng?: string | string[] | false; // Fallback language(s)
+    ns?: string[]; // Available namespaces
+    defaultNS?: string; // Default namespace
+    // ... and all other i18next InitOptions
+  };
 }
 ```
+
+### Debugging with 'cimode'
+
+For debugging translation keys, you can set `lng: 'cimode'`:
+
+```typescript
+i18nIntegration({
+  i18NextOptions: {
+    supportedLngs: ["en", "sk", "cs"],
+    lng: "cimode", // Shows translation keys instead of values
+    ns: ["common", "auth"],
+    defaultNS: "common",
+  },
+})
+```
+
+This will display keys like `common:greeting` instead of translated text, making it easy to identify missing translations or debug key usage.
 
 ### Client Functions
 

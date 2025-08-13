@@ -1,2 +1,2 @@
-export { getLocaleConfig } from "./utils/helpers";
+export { getConfig } from "./utils/helpers";
 export { getLocalizedPathname } from "./utils/localization";

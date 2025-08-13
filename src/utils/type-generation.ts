@@ -3,14 +3,19 @@ import { mergeResourcesAsInterface } from "i18next-resources-for-ts";
 import { join } from "node:path";
 import { relative, resolve } from "pathe";
 import { log } from "../logger";
-import { IntegrationOptionsInternal } from "../types/integration";
+import {
+  IntegrationOptions,
+  IntegrationOptionsInternal,
+} from "../types/integration";
 import { TranslationMap } from "../types/translations";
 
-function toNamespaceArray(
-  translationMap: TranslationMap,
-  defaultLocale: string
-) {
-  return Object.entries(translationMap[defaultLocale]).map(
+function toNamespaceArray(translationMap: TranslationMap, lng?: string) {
+  // Determine which locale to use for type generation
+  // If lng is 'cimode' or undefined, use the first available language
+  const localeForTypes =
+    !lng || lng === "cimode" ? Object.keys(translationMap)[0] : lng;
+
+  return Object.entries(translationMap[localeForTypes]).map(
     ([namespaceKey, resources]) => ({
       name: namespaceKey,
       resources,
@@ -21,16 +26,17 @@ function toNamespaceArray(
 export function generateTypescriptDefinitions(
   namespaces: TranslationMap,
   outputDirPath: string,
-  options: IntegrationOptionsInternal
+  internalOptions: IntegrationOptionsInternal,
+  i18nextOptions: IntegrationOptions["i18NextOptions"]
 ) {
   try {
     const INTERFACE_OUTPUT_FILE = join(
-      resolve(outputDirPath, options.generatedTypes.dirPath),
-      `${options.generatedTypes.fileName}.d.ts`
+      resolve(outputDirPath, internalOptions.generatedTypes.dirPath),
+      `${internalOptions.generatedTypes.fileName}.d.ts`
     );
 
     const typeDefinitionFile = mergeResourcesAsInterface(
-      toNamespaceArray(namespaces, options.defaultLocale)
+      toNamespaceArray(namespaces, i18nextOptions.lng)
     );
 
     const final = `
@@ -38,7 +44,7 @@ import "i18next";
 
 declare module "i18next" {
   interface CustomTypeOptions {
-    defaultNS: "${options.defaultNamespace}";
+    defaultNS: "${i18nextOptions.defaultNS === false ? "false" : i18nextOptions.defaultNS || "translation"}";
     resources: Resources;
   }
 }

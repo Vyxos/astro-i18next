@@ -1,7 +1,10 @@
-import { existsSync, readFileSync } from "fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "fs";
 import { resolve } from "pathe";
 import { logError, logWarn } from "./logger";
-import { IntegrationOptionsInternal } from "./types/integration";
+import {
+  IntegrationOptionsInternal,
+  IntegrationOptions,
+} from "./types/integration";
 import type {
   LocaleFileData,
   TranslationContent,
@@ -47,10 +50,15 @@ export function loadTranslation(filePath: string): TranslationContent {
  */
 export function loadAllTranslations(
   srcDir: string,
-  options: IntegrationOptionsInternal
+  internalOptions: IntegrationOptionsInternal,
+  i18nextOptions: IntegrationOptions["i18NextOptions"]
 ): TranslationMap {
   const allTranslations: TranslationMap = {};
-  const localeFilesData = getAllFilePaths(srcDir, options);
+  const localeFilesData = getAllFilePaths(
+    srcDir,
+    internalOptions,
+    i18nextOptions
+  );
 
   for (const data of localeFilesData) {
     if (allTranslations[data.locale] === undefined) {
@@ -65,20 +73,72 @@ export function loadAllTranslations(
 
 export function getAllFilePaths(
   srcDir: string,
-  options: IntegrationOptionsInternal
+  internalOptions: IntegrationOptionsInternal,
+  i18nextOptions: IntegrationOptions["i18NextOptions"]
 ) {
   const filePaths: LocaleFileData[] = [];
 
-  for (const locale of options.locales) {
-    for (const namespace of options.namespaces) {
-      const filePath = getFilePath(
-        locale,
-        namespace,
-        srcDir,
-        options.translationsDir
-      );
+  if (
+    i18nextOptions.supportedLngs === false ||
+    i18nextOptions.supportedLngs === undefined
+  ) {
+    const translationDirPath = resolve(srcDir, internalOptions.translationsDir);
 
-      filePaths.push({ path: filePath, locale, namespace });
+    if (!existsSync(translationDirPath)) {
+      return filePaths;
+    }
+
+    try {
+      const localeEntries = readdirSync(translationDirPath);
+
+      for (const localeEntry of localeEntries) {
+        const localeDir = resolve(translationDirPath, localeEntry);
+
+        if (statSync(localeDir).isDirectory()) {
+          const locale = localeEntry;
+
+          const translationFiles = readdirSync(localeDir);
+
+          for (const file of translationFiles) {
+            if (file.endsWith(".json")) {
+              const namespace = file.replace(".json", "");
+              const filePath = resolve(localeDir, file);
+              filePaths.push({ path: filePath, locale, namespace });
+            }
+          }
+        }
+      }
+    } catch (_error) {
+      logError(`Failed to scan translation directory: ${translationDirPath}`);
+      return filePaths;
+    }
+
+    return filePaths;
+  }
+
+  // Handle array supportedLngs (including empty arrays)
+  if (Array.isArray(i18nextOptions.supportedLngs)) {
+    // Convert ns to array format for iteration
+    let namespaces: string[] = [];
+    if (i18nextOptions.ns === undefined) {
+      namespaces = ["translation"]; // i18next default
+    } else if (typeof i18nextOptions.ns === "string") {
+      namespaces = [i18nextOptions.ns];
+    } else if (Array.isArray(i18nextOptions.ns)) {
+      namespaces = i18nextOptions.ns;
+    }
+
+    for (const locale of i18nextOptions.supportedLngs) {
+      for (const namespace of namespaces) {
+        const filePath = getFilePath(
+          locale,
+          namespace,
+          srcDir,
+          internalOptions.translationsDir
+        );
+
+        filePaths.push({ path: filePath, locale, namespace });
+      }
     }
   }
 
@@ -96,4 +156,45 @@ export function getFilePath(
     translationDirectoryPath,
     `${locale}/${namespace}.json`
   );
+}
+
+/**
+ * Discovers all available languages in the translations directory
+ */
+export function discoverAvailableLanguages(
+  srcDir: string,
+  translationsDir: string
+): string[] {
+  const translationDirPath = resolve(srcDir, translationsDir);
+
+  if (!existsSync(translationDirPath)) {
+    logWarn(`Translation directory not found: ${translationDirPath}`);
+    return [];
+  }
+
+  try {
+    const localeEntries = readdirSync(translationDirPath);
+    const availableLocales: string[] = [];
+
+    for (const localeEntry of localeEntries) {
+      const localeDir = resolve(translationDirPath, localeEntry);
+
+      if (statSync(localeDir).isDirectory()) {
+        // Verify this locale directory contains at least one .json file
+        const translationFiles = readdirSync(localeDir);
+        const hasJsonFiles = translationFiles.some((file) =>
+          file.endsWith(".json")
+        );
+
+        if (hasJsonFiles) {
+          availableLocales.push(localeEntry);
+        }
+      }
+    }
+
+    return availableLocales;
+  } catch (_error) {
+    logError(`Failed to scan translation directory: ${translationDirPath}`);
+    return [];
+  }
 }

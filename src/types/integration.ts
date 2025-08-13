@@ -14,61 +14,22 @@ export interface InternalKeys {
 }
 
 /**
- * Configuration keys that are transformed and passed to i18next.
- * These define the core internationalization behavior and are used in client.ts/server.ts scripts.
+ * Complete internal configuration with defaults applied.
+ * This represents the fully resolved internal configuration state.
  */
-export interface i18NextKeys {
-  /** Array of supported locale codes (e.g., ['en', 'fr', 'de']) */
-  locales: string[];
-
-  /** Default locale to use when no specific locale is detected */
-  defaultLocale: string;
-
-  /** Default namespace to use for translations */
-  defaultNamespace: string;
-
-  /** Array of all available translation namespaces */
-  namespaces: string[];
-}
-
-/**
- * Complete internal configuration combining both i18next and internal keys.
- * This represents the fully resolved configuration state used internally.
- */
-export interface IntegrationOptionsInternal extends i18NextKeys, InternalKeys {}
+export type IntegrationOptionsInternal = Required<InternalKeys>;
 
 /**
  * User-facing integration options as defined in astro.config.mjs.
- * Requires all i18next keys while making internal keys optional with defaults.
+ * Only requires translationsDir and generatedTypes, with all i18next options in i18NextOptions.
  */
-export type IntegrationOptions = Required<i18NextKeys> & Partial<InternalKeys>;
+export type IntegrationOptions = Partial<InternalKeys> & {
+  /** i18next configuration options */
+  i18NextOptions: InitOptions;
+};
 
 /**
  * Default values configuration for internal keys only.
- * i18NextKeys are always required from the user configuration.
+ * i18next options are always required from the user configuration.
  */
 export type DefaultIntegrationOptions = Required<InternalKeys>;
-
-/**
- * Configuration object passed directly to i18next initialization.
- * Extends InitOptions with required properties for the integration to function.
- */
-export interface I18nBaseConfig extends InitOptions {
-  /** Current language code */
-  lng: string;
-
-  /** Fallback language when translation is missing */
-  fallbackLng: string;
-
-  /** Array of supported language codes */
-  supportedLngs: string[];
-
-  /** Default namespace for translations */
-  defaultNS: string;
-
-  /** Fallback namespace when default namespace fails */
-  fallbackNS: string;
-
-  /** Array of loaded namespaces */
-  ns: string[];
-}
