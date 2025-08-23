@@ -1,12 +1,13 @@
 import { INTEGRATION_NAME } from "./constants";
 import {
   discoverAvailableLanguages,
+  getAllFilePaths,
   getFilePath,
   loadTranslation,
-} from "./translation-loader";
+} from "./loader/translation-loader";
 import type {
-  IntegrationOptionsInternal,
   IntegrationOptions,
+  IntegrationOptionsInternal,
 } from "./types/integration";
 
 /**
@@ -25,9 +26,14 @@ export function createI18nVitePlugin(
       const match = id.match(/^virtual:i18n-translation:(.+)\/(.+)$/);
       if (match) return id;
 
-      const virtualMatch = id.match(/^\.?\/virtual-i18n-(.+)-(.+)\.js$/);
-      if (virtualMatch)
-        return `virtual:i18n-translation:${virtualMatch[1]}/${virtualMatch[2]}`;
+      // Use double underscore as separator to avoid conflicts with dashes in namespaces
+      const virtualMatch = id.match(/^\.?\/virtual-i18n-(.+?)__(.+)\.js$/);
+      if (virtualMatch) {
+        // Convert back dots for nested namespaces (e.g., features.dashboard)
+        const locale = virtualMatch[1];
+        const namespace = virtualMatch[2];
+        return `virtual:i18n-translation:${locale}/${namespace}`;
+      }
 
       return null;
     },
@@ -72,35 +78,78 @@ function generateDynamicTranslationLoader(
   // - []: support no languages
   // - array with items: support those specific languages
   let locales: string[] = [];
+  let namespaces: string[] = [];
 
   if (
     i18nextOptions.supportedLngs === false ||
     i18nextOptions.supportedLngs === undefined
   ) {
-    // Automatically discover languages from translations directory
+    // Automatically discover languages and namespaces from translations directory
     locales = discoverAvailableLanguages(
       srcDir,
       internalOptions.translationsDir
     );
+
+    // Discover all namespaces from the file system for automatic discovery
+    const allFilePaths = getAllFilePaths(
+      srcDir,
+      internalOptions,
+      i18nextOptions
+    );
+
+    const discoveredNamespaces = new Set<string>();
+
+    allFilePaths.forEach(({ namespace }) =>
+      discoveredNamespaces.add(namespace)
+    );
+
+    namespaces = Array.from(discoveredNamespaces);
+
+    // If no namespaces found, fall back to configured or default
+    if (namespaces.length === 0) {
+      if (i18nextOptions.ns === undefined) {
+        namespaces = ["translation"]; // i18next default
+      } else if (typeof i18nextOptions.ns === "string") {
+        namespaces = [i18nextOptions.ns];
+      } else if (Array.isArray(i18nextOptions.ns)) {
+        namespaces = i18nextOptions.ns;
+      }
+    }
   } else if (Array.isArray(i18nextOptions.supportedLngs)) {
     locales = i18nextOptions.supportedLngs;
-  }
 
-  // Convert ns to array format for iteration
-  let namespaces: string[] = [];
-  if (i18nextOptions.ns === undefined) {
-    namespaces = ["translation"]; // i18next default
-  } else if (typeof i18nextOptions.ns === "string") {
-    namespaces = [i18nextOptions.ns];
-  } else if (Array.isArray(i18nextOptions.ns)) {
-    namespaces = i18nextOptions.ns;
+    // For explicit locales, discover or use configured namespaces
+    if (i18nextOptions.ns === undefined) {
+      // Try to discover namespaces from the file system
+      const allFilePaths = getAllFilePaths(
+        srcDir,
+        internalOptions,
+        i18nextOptions
+      );
+      const discoveredNamespaces = new Set<string>();
+      allFilePaths.forEach(({ namespace }) =>
+        discoveredNamespaces.add(namespace)
+      );
+      namespaces = Array.from(discoveredNamespaces);
+
+      // If no namespaces discovered, use default
+      if (namespaces.length === 0) {
+        namespaces = ["translation"]; // i18next default
+      }
+    } else if (typeof i18nextOptions.ns === "string") {
+      namespaces = [i18nextOptions.ns];
+    } else if (Array.isArray(i18nextOptions.ns)) {
+      namespaces = i18nextOptions.ns;
+    }
   }
 
   locales.forEach((locale) => {
     namespaces.forEach((namespace) => {
+      // Replace dots and dashes with underscores for variable names
       const importVar = `${locale}_${namespace}`.replace(/[^a-zA-Z0-9_]/g, "_");
+      // Use double underscore separator to avoid conflicts with dashes in namespaces
       importMap.push(
-        `const ${importVar} = () => import('./virtual-i18n-${locale}-${namespace}.js');`
+        `const ${importVar} = () => import('./virtual-i18n-${locale}__${namespace}.js');`
       );
       caseStatements.push(
         `    case '${locale}/${namespace}': return (await ${importVar}()).default || {};`

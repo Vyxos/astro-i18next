@@ -1,9 +1,12 @@
 import type { AstroIntegration } from "astro";
 import { applyInternalDefaults } from "./config";
 import { INTEGRATION_NAME } from "./constants";
+import {
+  getAllFilePaths,
+  loadAllTranslations,
+} from "./loader/translation-loader";
 import { generateClientScript } from "./scripts/client";
 import { generateServerScript } from "./scripts/server";
-import { getAllFilePaths, loadAllTranslations } from "./translation-loader";
 import type { IntegrationOptions } from "./types/integration";
 import { generateTypescriptDefinitions } from "./utils/type-generation";
 import { validateOptions } from "./validation";
