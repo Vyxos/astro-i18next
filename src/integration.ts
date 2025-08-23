@@ -7,6 +7,7 @@ import {
 } from "./loader/translation-loader";
 import { generateClientScript } from "./scripts/client";
 import { generateServerScript } from "./scripts/server";
+import { generateSSGSerializationScript } from "./scripts/ssg";
 import type { IntegrationOptions } from "./types/integration";
 import { generateTypescriptDefinitions } from "./utils/type-generation";
 import { validateOptions } from "./validation";
@@ -55,6 +56,16 @@ export function i18nIntegration(options: IntegrationOptions): AstroIntegration {
               allTranslations,
               internalOptions,
               options.i18NextOptions
+            )
+          );
+
+          // CRITICAL: For SSG pages, inject inline serialization script first
+          injectScript(
+            "head-inline",
+            generateSSGSerializationScript(
+              options.i18NextOptions,
+              allTranslations,
+              internalOptions
             )
           );
 
