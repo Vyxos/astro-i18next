@@ -1,15 +1,15 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "fs";
 import { resolve } from "pathe";
-import { logError, logWarn } from "./logger";
+import { logError, logWarn } from "../logger";
 import {
-  IntegrationOptionsInternal,
   IntegrationOptions,
-} from "./types/integration";
+  IntegrationOptionsInternal,
+} from "../types/integration";
 import type {
   LocaleFileData,
   TranslationContent,
   TranslationMap,
-} from "./types/translations";
+} from "../types/translations";
 
 /**
  * Loads a translation file for a specific locale and namespace
@@ -71,6 +71,48 @@ export function loadAllTranslations(
   return allTranslations;
 }
 
+/**
+ * Recursively scans a directory for JSON translation files
+ */
+function scanDirectoryRecursively(
+  currentPath: string,
+  localeBasePath: string,
+  locale: string,
+  filePaths: LocaleFileData[]
+): void {
+  try {
+    const entries = readdirSync(currentPath);
+
+    for (const entry of entries) {
+      const entryPath = resolve(currentPath, entry);
+      const stats = statSync(entryPath);
+
+      if (stats.isDirectory()) {
+        // Recursively scan subdirectories
+        scanDirectoryRecursively(entryPath, localeBasePath, locale, filePaths);
+      } else if (entry.endsWith(".json")) {
+        // Calculate the namespace from the relative path
+        // e.g., if file is at locale/features/dashboard.json
+        // the namespace should be "features.dashboard"
+        const relativePath = entryPath.substring(localeBasePath.length + 1);
+        const pathParts = relativePath.split(/[/\\]/);
+
+        // Remove .json extension from the last part
+        pathParts[pathParts.length - 1] = pathParts[
+          pathParts.length - 1
+        ].replace(".json", "");
+
+        // Join with dots to create the namespace
+        const namespace = pathParts.join(".");
+
+        filePaths.push({ path: entryPath, locale, namespace });
+      }
+    }
+  } catch (_error) {
+    logWarn(`Failed to scan directory: ${currentPath}`);
+  }
+}
+
 export function getAllFilePaths(
   srcDir: string,
   internalOptions: IntegrationOptionsInternal,
@@ -97,15 +139,8 @@ export function getAllFilePaths(
         if (statSync(localeDir).isDirectory()) {
           const locale = localeEntry;
 
-          const translationFiles = readdirSync(localeDir);
-
-          for (const file of translationFiles) {
-            if (file.endsWith(".json")) {
-              const namespace = file.replace(".json", "");
-              const filePath = resolve(localeDir, file);
-              filePaths.push({ path: filePath, locale, namespace });
-            }
-          }
+          // Recursively scan for JSON files with support for nested directories
+          scanDirectoryRecursively(localeDir, localeDir, locale, filePaths);
         }
       }
     } catch (_error) {
@@ -118,10 +153,34 @@ export function getAllFilePaths(
 
   // Handle array supportedLngs (including empty arrays)
   if (Array.isArray(i18nextOptions.supportedLngs)) {
-    // Convert ns to array format for iteration
+    // If namespaces are not explicitly configured, discover them from the file system
     let namespaces: string[] = [];
+
     if (i18nextOptions.ns === undefined) {
-      namespaces = ["translation"]; // i18next default
+      // Try to discover namespaces from the file system for each locale
+      const translationDirPath = resolve(
+        srcDir,
+        internalOptions.translationsDir
+      );
+      const discoveredNamespaces = new Set<string>();
+
+      for (const locale of i18nextOptions.supportedLngs) {
+        const localeDir = resolve(translationDirPath, locale);
+        if (existsSync(localeDir) && statSync(localeDir).isDirectory()) {
+          const tempFilePaths: LocaleFileData[] = [];
+          scanDirectoryRecursively(localeDir, localeDir, locale, tempFilePaths);
+          tempFilePaths.forEach(({ namespace }) =>
+            discoveredNamespaces.add(namespace)
+          );
+        }
+      }
+
+      namespaces = Array.from(discoveredNamespaces);
+
+      // If no namespaces discovered, use default
+      if (namespaces.length === 0) {
+        namespaces = ["translation"]; // i18next default
+      }
     } else if (typeof i18nextOptions.ns === "string") {
       namespaces = [i18nextOptions.ns];
     } else if (Array.isArray(i18nextOptions.ns)) {
@@ -151,11 +210,42 @@ export function getFilePath(
   srcDir: string,
   translationDirectoryPath: string
 ) {
+  // Handle nested namespaces with dot notation
+  // e.g., "features.dashboard" becomes "features/dashboard.json"
+  const namespacePath = namespace.replace(/\./g, "/");
+
   return resolve(
     srcDir,
     translationDirectoryPath,
-    `${locale}/${namespace}.json`
+    `${locale}/${namespacePath}.json`
   );
+}
+
+/**
+ * Checks if a directory contains JSON files (recursively)
+ */
+function hasJsonFilesRecursively(dirPath: string): boolean {
+  try {
+    const entries = readdirSync(dirPath);
+
+    for (const entry of entries) {
+      const entryPath = resolve(dirPath, entry);
+      const stats = statSync(entryPath);
+
+      if (stats.isDirectory()) {
+        // Recursively check subdirectories
+        if (hasJsonFilesRecursively(entryPath)) {
+          return true;
+        }
+      } else if (entry.endsWith(".json")) {
+        return true;
+      }
+    }
+
+    return false;
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -180,13 +270,8 @@ export function discoverAvailableLanguages(
       const localeDir = resolve(translationDirPath, localeEntry);
 
       if (statSync(localeDir).isDirectory()) {
-        // Verify this locale directory contains at least one .json file
-        const translationFiles = readdirSync(localeDir);
-        const hasJsonFiles = translationFiles.some((file) =>
-          file.endsWith(".json")
-        );
-
-        if (hasJsonFiles) {
+        // Verify this locale directory contains at least one .json file (checking recursively)
+        if (hasJsonFilesRecursively(localeDir)) {
           availableLocales.push(localeEntry);
         }
       }
