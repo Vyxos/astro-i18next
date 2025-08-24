@@ -11,9 +11,6 @@ importers:
       astro:
         specifier: ^5.11.0
         version: 5.12.1(@types/node@20.19.9)(jiti@2.4.2)(rollup@4.45.1)(typescript@5.8.3)(yaml@2.8.0)
-      colorette:
-        specifier: ^2.0.20
-        version: 2.0.20
       i18next:
         specifier: ^25.3.2
         version: 25.3.2(typescript@5.8.3)
@@ -26,6 +23,9 @@ importers:
       i18next-http-backend:
         specifier: ^3.0.2
         version: 3.0.2
+      kleur:
+        specifier: ^4.1.5
+        version: 4.1.5
       pathe:
         specifier: ^2.0.3
         version: 2.0.3

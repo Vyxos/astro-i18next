@@ -1,46 +1,32 @@
-// Browser-safe colorings that prevent TTY module access
+// Browser-safe colorings using kleur (same as Astro core)
+import { bold, dim, green, red, yellow } from "kleur/colors";
+
 const isBrowser = typeof window !== "undefined";
 const noOp = (value: string) => value;
 
-// Safely load colorette only in server environments
-let colorFunctions: {
-  bold: (text: string) => string;
-  gray: (text: string) => string;
-  greenBright: (text: string) => string;
-  red: (text: string) => string;
-  yellow: (text: string) => string;
-};
+// Color functions that work in both server and browser environments
+const colorFunctions = isBrowser
+  ? {
+      // Browser fallback - no colors
+      bold: noOp,
+      dim: noOp,
+      green: noOp,
+      red: noOp,
+      yellow: noOp,
+    }
+  : {
+      // Server: use kleur/colors (same as Astro core)
+      bold: bold || noOp,
+      dim: dim || noOp,
+      green: green || noOp,
+      red: red || noOp,
+      yellow: yellow || noOp,
+    };
 
-try {
-  if (isBrowser) {
-    throw new Error("Browser environment detected");
-  }
-
-  // Server: dynamically require colorette to avoid bundling issues
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const colorette = require("colorette");
-  colorFunctions = {
-    bold: colorette.bold || noOp,
-    gray: colorette.gray || noOp,
-    greenBright: colorette.greenBright || noOp,
-    red: colorette.red || noOp,
-    yellow: colorette.yellow || noOp,
-  };
-} catch {
-  // Fallback for browser environments or when colorette fails to load
-  colorFunctions = {
-    bold: noOp,
-    gray: noOp,
-    greenBright: noOp,
-    red: noOp,
-    yellow: noOp,
-  };
-}
-
-export const colorTimestamp = (value: string) => colorFunctions.gray(value);
+export const colorTimestamp = (value: string) => colorFunctions.dim(value);
 
 export const colorIntegration = (value: string) =>
-  colorFunctions.bold(colorFunctions.greenBright(value));
+  colorFunctions.bold(colorFunctions.green(value));
 
 export const colorWarn = (value: string) => colorFunctions.yellow(value);
 
