@@ -1,73 +1,52 @@
-// Browser-safe colorings that don't use TTY
+// Browser-safe colorings that prevent TTY module access
 const isBrowser = typeof window !== "undefined";
-
-// No-op function for browser environments
 const noOp = (value: string) => value;
 
-// Color functions that work conditionally
-export const colorTimestamp = (value: string) => {
-  if (isBrowser) return noOp(value);
-  try {
-    // Dynamic import only in Node.js environment
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { gray } = require("colorette");
-    return gray(value);
-  } catch {
-    return noOp(value);
-  }
+// Safely load colorette only in server environments
+let colorFunctions: {
+  bold: (text: string) => string;
+  gray: (text: string) => string;
+  greenBright: (text: string) => string;
+  red: (text: string) => string;
+  yellow: (text: string) => string;
 };
 
-export const colorIntegration = (value: string) => {
-  if (isBrowser) return noOp(value);
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { bold, greenBright } = require("colorette");
-    return bold(greenBright(value));
-  } catch {
-    return noOp(value);
+try {
+  if (isBrowser) {
+    throw new Error("Browser environment detected");
   }
-};
 
-export const colorWarn = (value: string) => {
-  if (isBrowser) return noOp(value);
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { yellow } = require("colorette");
-    return yellow(value);
-  } catch {
-    return noOp(value);
-  }
-};
+  // Server: dynamically require colorette to avoid bundling issues
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const colorette = require("colorette");
+  colorFunctions = {
+    bold: colorette.bold || noOp,
+    gray: colorette.gray || noOp,
+    greenBright: colorette.greenBright || noOp,
+    red: colorette.red || noOp,
+    yellow: colorette.yellow || noOp,
+  };
+} catch {
+  // Fallback for browser environments or when colorette fails to load
+  colorFunctions = {
+    bold: noOp,
+    gray: noOp,
+    greenBright: noOp,
+    red: noOp,
+    yellow: noOp,
+  };
+}
 
-export const colorError = (value: string) => {
-  if (isBrowser) return noOp(value);
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { red } = require("colorette");
-    return red(value);
-  } catch {
-    return noOp(value);
-  }
-};
+export const colorTimestamp = (value: string) => colorFunctions.gray(value);
 
-export const colorWarnPrefix = (value: string) => {
-  if (isBrowser) return noOp(value);
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { bold, yellow } = require("colorette");
-    return bold(yellow(value));
-  } catch {
-    return noOp(value);
-  }
-};
+export const colorIntegration = (value: string) =>
+  colorFunctions.bold(colorFunctions.greenBright(value));
 
-export const colorErrorPrefix = (value: string) => {
-  if (isBrowser) return noOp(value);
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { red } = require("colorette");
-    return red(value);
-  } catch {
-    return noOp(value);
-  }
-};
+export const colorWarn = (value: string) => colorFunctions.yellow(value);
+
+export const colorError = (value: string) => colorFunctions.red(value);
+
+export const colorWarnPrefix = (value: string) =>
+  colorFunctions.bold(colorFunctions.yellow(value));
+
+export const colorErrorPrefix = (value: string) => colorFunctions.red(value);
