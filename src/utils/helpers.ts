@@ -1,8 +1,8 @@
 import i18next from "i18next";
 import { INTEGRATION_NAME } from "../constants";
 import {
-  IntegrationOptionsInternal,
   IntegrationOptions,
+  IntegrationOptionsInternal,
 } from "../types/integration";
 
 /**
@@ -30,11 +30,4 @@ export function getConfig(): IntegrationOptionsInternal &
   ) as typeof i18next.options.integrationOptions;
 }
 
-// Browser environment check
-function isBrowser(): boolean {
-  return typeof globalThis !== "undefined" && "window" in globalThis;
-}
-
-export function getGlobalObject() {
-  return isBrowser() ? globalThis : undefined;
-}
+export { getGlobalObject } from "./browser-helpers";

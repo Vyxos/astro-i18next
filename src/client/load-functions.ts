@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { INTEGRATION_NAME } from "../constants";
-import { getGlobalObject } from "../utils/helpers";
+import { getGlobalObject } from "../utils/browser-helpers";
 
 /**
  * Helper function to load namespaces for a route in TanStack Router beforeLoad

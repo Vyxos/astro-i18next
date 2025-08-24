@@ -6,8 +6,8 @@ import {
   useLoadNamespaces,
 } from "../../client/load-functions";
 
-// Mock the helpers module
-vi.mock("../../utils/helpers", () => ({
+// Mock the browser-helpers module
+vi.mock("../../utils/browser-helpers", () => ({
   getGlobalObject: vi.fn(),
 }));
 
@@ -16,7 +16,7 @@ vi.mock("../../constants", () => ({
   INTEGRATION_NAME: "@vyxos/astro-i18next",
 }));
 
-import { getGlobalObject } from "../../utils/helpers";
+import { getGlobalObject } from "../../utils/browser-helpers";
 
 const mockGetGlobalObject = vi.mocked(getGlobalObject);
 
