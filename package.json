@@ -1,6 +1,6 @@
 {
   "name": "@vyxos/astro-i18next",
-  "version": "0.5.8",
+  "version": "0.5.9",
   "description": "I18next integration for Astro with dynamic namespace loading.",
   "author": {
     "name": "Marek Fodor",
