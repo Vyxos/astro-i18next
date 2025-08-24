@@ -1,13 +1,14 @@
-// Browser-safe colorings - NO imports at module level
+// Browser-safe colorings - createRequire for ESM compatibility
+import { createRequire } from "module";
+
 const isBrowser = typeof window !== "undefined";
+const nodeRequire = isBrowser ? null : createRequire(import.meta.url);
 
 // Synchronous color functions with fallback
 export const colorTimestamp = (value: string) => {
-  if (isBrowser) return value;
+  if (isBrowser || !nodeRequire) return value;
   try {
-    // Only require kleur when actually called in server environment
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { dim } = require("kleur/colors");
+    const { dim } = nodeRequire("kleur/colors");
     return dim(value);
   } catch {
     return value;
@@ -15,10 +16,9 @@ export const colorTimestamp = (value: string) => {
 };
 
 export const colorIntegration = (value: string) => {
-  if (isBrowser) return value;
+  if (isBrowser || !nodeRequire) return value;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { bold, green } = require("kleur/colors");
+    const { bold, green } = nodeRequire("kleur/colors");
     return bold(green(value));
   } catch {
     return value;
@@ -26,10 +26,9 @@ export const colorIntegration = (value: string) => {
 };
 
 export const colorWarn = (value: string) => {
-  if (isBrowser) return value;
+  if (isBrowser || !nodeRequire) return value;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { yellow } = require("kleur/colors");
+    const { yellow } = nodeRequire("kleur/colors");
     return yellow(value);
   } catch {
     return value;
@@ -37,10 +36,9 @@ export const colorWarn = (value: string) => {
 };
 
 export const colorError = (value: string) => {
-  if (isBrowser) return value;
+  if (isBrowser || !nodeRequire) return value;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { red } = require("kleur/colors");
+    const { red } = nodeRequire("kleur/colors");
     return red(value);
   } catch {
     return value;
@@ -48,10 +46,9 @@ export const colorError = (value: string) => {
 };
 
 export const colorWarnPrefix = (value: string) => {
-  if (isBrowser) return value;
+  if (isBrowser || !nodeRequire) return value;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { bold, yellow } = require("kleur/colors");
+    const { bold, yellow } = nodeRequire("kleur/colors");
     return bold(yellow(value));
   } catch {
     return value;
@@ -59,10 +56,9 @@ export const colorWarnPrefix = (value: string) => {
 };
 
 export const colorErrorPrefix = (value: string) => {
-  if (isBrowser) return value;
+  if (isBrowser || !nodeRequire) return value;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { red } = require("kleur/colors");
+    const { red } = nodeRequire("kleur/colors");
     return red(value);
   } catch {
     return value;
