@@ -14,6 +14,6 @@ export default defineConfig({
   splitting: false,
   treeshake: true,
   minify: false,
-  external: ["astro", "react"],
+  external: ["astro", "react", "tty", "fs", "path", "os"],
   cjsInterop: true,
 });
